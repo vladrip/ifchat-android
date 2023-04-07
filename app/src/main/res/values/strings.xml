@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">IFChat</string>
+    <string name="login_title">Hello There!</string>
+    <string name="login_welcome_back">Sign in to your account</string>
+    <string name="hint_phone">Enter phone number</string>
+    <string name="hint_password">Password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="sign_in">Sign in</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="register_title">Create an account</string>
+    <string name="hint_register_username">Enter username</string>
+    <string name="hint_password_repeat">Repeat password</string>
+    <string name="sign_up">Sign up</string>
+    <string name="regex_phone_number" translatable="false">^[+]{1}(?:[0-9\-\(\)\/\.]\s?){6,15}[0-9]{1}$</string>
+    <string name="register_sign_in">Already have an account? Sign in!</string>
+    <string name="login_sign_up">Don\'t have an account yet? Sign up!</string>
+    <string name="login_successful">You are signed in as %s!</string>
+    <string name="settings">Settings</string>
+    <string name="saved_messages">Saved Messages</string>
+    <string name="last_online_at">Last online at %s</string>
+    <string name="group_members_count">%d members</string>
+    <string name="loading">loading…</string>
+    <string name="unknown">unknown</string>
+
+    <!-- Test Preferences -->
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="chats">Chats</string>
+    <string name="log_out">Log out</string>
+    <string name="user_avatar">User avatar</string>
+    <string name="test_username">Vladyslav Ripskyi</string>
+    <string name="test_phone_number">+380993011337</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="contacts">Contacts</string>
+    <string name="search">Search</string>
+    <string name="mute_notifications">Mute Notifications</string>
+    <string name="test_list_chat_short_info">Newest message in chat</string>
+    <string name="test_chat_last_msg_time">14:52</string>
+</resources>

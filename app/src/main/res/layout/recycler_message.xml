@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:maxWidth="@dimen/_200sdp"
+    android:layout_gravity="start"
+    android:padding="@dimen/_4sdp"
+    android:layout_marginBottom="@dimen/_10sdp"
+    android:theme="@style/Theme.IFChat.Elevated">
+
+    <TextView
+        android:id="@+id/message_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@id/message_sent_at"
+        android:textSize="@dimen/_10ssp"
+        android:maxLines="1"
+        android:textColor="@color/palette3"
+        android:ellipsize="end" />
+
+    <TextView
+        android:id="@+id/message_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/message_username"
+        android:layout_toStartOf="@id/message_sent_at"
+        android:textColor="@color/palette4" />
+
+    <TextView
+        android:id="@+id/message_sent_at"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/message_content"
+        android:layout_alignParentEnd="true"
+        android:textSize="@dimen/_9ssp"
+        android:textColor="@color/disabled" />
+</RelativeLayout>
