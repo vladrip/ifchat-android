@@ -6,16 +6,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
-import androidx.paging.PagingDataAdapter;
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vladrip.ifchat.R
 import com.vladrip.ifchat.model.entity.ChatListEl
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.time.temporal.WeekFields
-import java.util.Locale
+import com.vladrip.ifchat.utils.FormatHelper
 
 class ChatListAdapter :
     PagingDataAdapter<ChatListEl, ChatListAdapter.ChatViewHolder>(CHAT_LIST_ELEMENT_COMPARATOR) {
@@ -49,7 +45,7 @@ class ChatListAdapter :
             itemView.findViewById<TextView>(R.id.chat_name).text = chatListEl.chatName
             itemView.findViewById<TextView>(R.id.chat_short_info).text = chatListEl.lastMsgContent
             itemView.findViewById<TextView>(R.id.chat_last_msg_time).text =
-                format(chatListEl.lastMsgSentAt)
+                FormatHelper.formatLastSent(chatListEl.lastMsgSentAt)
 
             itemView.setOnClickListener {
                 val bundle = bundleOf(
@@ -58,25 +54,6 @@ class ChatListAdapter :
                 )
                 itemView.findNavController().navigate(R.id.action_chat_list_to_chat, bundle)
             }
-        }
-
-        private fun format(dateTime: LocalDateTime): String {
-            val now = LocalDateTime.now()
-            val weekOfMonth = WeekFields.of(Locale.getDefault()).weekOfMonth()
-            val formatter = when {
-                dateTime.year != now.year ->
-                    DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
-
-                dateTime.monthValue != now.monthValue ||
-                        dateTime.get(weekOfMonth) != now.get(weekOfMonth) ->
-                    DateTimeFormatter.ofPattern("MMM dd")
-
-                dateTime.dayOfYear != now.dayOfYear ->
-                    DateTimeFormatter.ofPattern("EEE")
-
-                else -> DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(Locale.UK)
-            }
-            return dateTime.format(formatter)
         }
     }
 }

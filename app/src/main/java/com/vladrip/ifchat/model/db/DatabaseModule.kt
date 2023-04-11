@@ -11,10 +11,10 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object LocalDatabaseModule {
+object DatabaseModule {
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): LocalDatabase {
+    fun provideLocalDatabase(@ApplicationContext context: Context): LocalDatabase {
         return Room
             .databaseBuilder(context, LocalDatabase::class.java, "Local.db")
             .build()

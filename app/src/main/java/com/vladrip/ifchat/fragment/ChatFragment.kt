@@ -19,16 +19,14 @@ import androidx.navigation.fragment.findNavController
 import com.vladrip.ifchat.R
 import com.vladrip.ifchat.adapter.MessagesAdapter
 import com.vladrip.ifchat.databinding.FragmentChatBinding
-import com.vladrip.ifchat.model.entity.Chat
 import com.vladrip.ifchat.model.entity.Chat.ChatType
 import com.vladrip.ifchat.ui.ChatViewModel
+import com.vladrip.ifchat.ui.state.ChatUiState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class ChatFragment : Fragment(), MenuProvider {
@@ -60,16 +58,20 @@ class ChatFragment : Fragment(), MenuProvider {
             ?: ChatType.GROUP
 
         initAppBar() //TODO: real user phone number
-        adapter = MessagesAdapter(chatType, "+380 99 301 4772")
+        adapter = MessagesAdapter(chatType, "+380 99 301 1337")
         binding.messages.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 val chat = withContext(Dispatchers.Default) {
-                    chatViewModel.getChatById(chatId, chatType)
+                    chatViewModel.getChatById(chatId, chatType, requireContext())
                 }
                 fillAppBar(chat)
+            }
+        }
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 chatViewModel.getMessages(chatId).collectLatest {
                     adapter.submitData(it)
                 }
@@ -80,7 +82,6 @@ class ChatFragment : Fragment(), MenuProvider {
     private fun initAppBar() {
         appbar = layoutInflater.inflate(R.layout.appbar_chat, binding.root, false)
         appbar.findViewById<TextView>(R.id.chat_name).text = getString(R.string.loading)
-        appbar.findViewById<TextView>(R.id.chat_short_info).text = getString(R.string.loading)
 
         (requireActivity() as AppCompatActivity).supportActionBar?.run {
             setDisplayShowCustomEnabled(true)
@@ -88,18 +89,9 @@ class ChatFragment : Fragment(), MenuProvider {
         }
     }
 
-    private fun fillAppBar(chat: Chat) {
+    private fun fillAppBar(chat: ChatUiState) {
         appbar.findViewById<TextView>(R.id.chat_name).text = chat.name
-        when (chat.type) {
-            ChatType.PRIVATE -> {
-                appbar.findViewById<TextView>(R.id.chat_short_info).text =
-                getString(R.string.last_online_at, chatViewModel.format(chat.description, this.requireContext()))
-            }
-            ChatType.GROUP -> {
-                appbar.findViewById<TextView>(R.id.chat_short_info).text =
-                    getString(R.string.group_members_count, chat.memberCount)
-            }
-        }
+        appbar.findViewById<TextView>(R.id.chat_short_info).text = chat.shortInfo
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {

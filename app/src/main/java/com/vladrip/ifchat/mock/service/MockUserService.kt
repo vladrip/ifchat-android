@@ -3,7 +3,7 @@ package com.vladrip.ifchat.mock.service
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import com.vladrip.ifchat.Constants
+import com.vladrip.ifchat.mock.Constants
 import com.vladrip.ifchat.mock.dto.User
 
 class MockUserService(c: Context) {

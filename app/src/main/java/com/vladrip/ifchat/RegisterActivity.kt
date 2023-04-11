@@ -9,8 +9,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
-import com.vladrip.ifchat.Constants.PASSWORD_MIN_LENGTH
-import com.vladrip.ifchat.Constants.USERNAME_MIN_LENGTH
+import com.vladrip.ifchat.mock.Constants.PASSWORD_MIN_LENGTH
+import com.vladrip.ifchat.mock.Constants.USERNAME_MIN_LENGTH
 import com.vladrip.ifchat.mock.dto.User
 import com.vladrip.ifchat.mock.service.MockUserService
 

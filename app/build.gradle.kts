@@ -17,12 +17,6 @@ android {
         versionName = "0.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testApplicationId = "com.vladrip.ifchat"
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments["room.schemaLocation"] = "$projectDir/schemas"
-            }
-        }
     }
 
     buildTypes {
@@ -57,7 +51,7 @@ dependencies {
     val adaptingUnitsVersion = "1.1.0"
 
     //android, google
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.10.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.preference:preference:1.2.0")
@@ -79,6 +73,7 @@ dependencies {
     //retrofit
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
+    implementation("com.github.haroldadmin:NetworkResponseAdapter:5.0.0")
 
     //hilt
     implementation("com.google.dagger:hilt-android:$hiltVersion")

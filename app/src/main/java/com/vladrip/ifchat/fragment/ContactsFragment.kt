@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.vladrip.ifchat.Constants
 import com.vladrip.ifchat.databinding.FragmentContactsBinding
+import com.vladrip.ifchat.mock.Constants
 import com.vladrip.ifchat.mock.adapter.ContactsAdapter
 import com.vladrip.ifchat.mock.dto.Contact
 
@@ -37,7 +37,7 @@ class ContactsFragment : Fragment() {
             ),
             c
         )
-        binding.contactRecycler.setItemViewCacheSize(Constants.RECYCLER_CACHE_SIZE)
+        binding.contactRecycler.setItemViewCacheSize(Constants.CONTACTS_RECYCLER_CACHE_SIZE)
 
         val itemDecorator = DividerItemDecoration(c, DividerItemDecoration.VERTICAL)
         itemDecorator.setDrawable(

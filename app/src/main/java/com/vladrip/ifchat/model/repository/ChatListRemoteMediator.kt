@@ -6,8 +6,8 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.vladrip.ifchat.model.db.LocalDatabase
 import com.vladrip.ifchat.model.api.IFChatApi
+import com.vladrip.ifchat.model.db.LocalDatabase
 import com.vladrip.ifchat.model.entity.ChatListEl
 import com.vladrip.ifchat.model.entity.ChatListRemoteKeys
 import retrofit2.HttpException

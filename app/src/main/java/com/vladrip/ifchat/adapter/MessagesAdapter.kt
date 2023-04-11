@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -13,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.vladrip.ifchat.R
 import com.vladrip.ifchat.model.entity.Chat.ChatType
 import com.vladrip.ifchat.model.entity.Message
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 

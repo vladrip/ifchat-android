@@ -1,5 +1,6 @@
 package com.vladrip.ifchat.model.api
 
+import com.haroldadmin.cnradapter.NetworkResponse
 import com.vladrip.ifchat.model.entity.Chat
 import com.vladrip.ifchat.model.entity.Chat.ChatType
 import com.vladrip.ifchat.model.entity.ChatListEl
@@ -11,8 +12,13 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-//TODO: error handling, remove isOnline in repos
 interface IFChatApi {
+
+    class ErrorResponse (
+        val status: Int,
+        val error: String
+    )
+
     class ChatListResponse(
         val content: List<ChatListEl>
     )
@@ -32,12 +38,12 @@ interface IFChatApi {
     suspend fun getPrivateChat(
         @Path("id") id: Long,
         @Query("personId") personId: Long
-    ): PrivateChatResponse
+    ): NetworkResponse<PrivateChatResponse, ErrorResponse>
 
     @GET("chats/g{id}")
     suspend fun getGroupChat(
         @Path("id") id: Long
-    ): Chat
+    ): NetworkResponse<Chat, ErrorResponse>
 
     @GET("chats/{id}/messages")
     suspend fun getMessages(

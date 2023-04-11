@@ -1,13 +1,18 @@
 package com.vladrip.ifchat.model.repository
 
+import android.content.Context
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import com.haroldadmin.cnradapter.NetworkResponse
+import com.vladrip.ifchat.R
 import com.vladrip.ifchat.model.api.IFChatApi
 import com.vladrip.ifchat.model.db.LocalDatabase
 import com.vladrip.ifchat.model.entity.Chat
 import com.vladrip.ifchat.model.entity.Chat.ChatType
-import com.vladrip.ifchat.model.entity.Person
+import com.vladrip.ifchat.ui.state.ChatUiState
+import com.vladrip.ifchat.ui.state.StateHolder
+import com.vladrip.ifchat.utils.FormatHelper
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,30 +35,37 @@ class ChatRepository @Inject constructor(
         chatListDao.getOrderByLatestMsg()
     }.flow
 
-    //TODO: add presenter, he should map private or group chat to ui chat and format time
-    suspend fun getChatById(id: Long, type: ChatType): Chat {
-        val uiChat: Chat
+    suspend fun getChatById(id: Long, type: ChatType, context: Context): StateHolder<ChatUiState> {
+        val response = when(type) {
+            ChatType.PRIVATE -> api.getPrivateChat(id, getUserId())
+            ChatType.GROUP -> api.getGroupChat(id)
+        }
+        return when(response) {
+            is NetworkResponse.Success -> {
+                return when(type) {
+                    ChatType.PRIVATE -> {
+                        val body = response.body as IFChatApi.PrivateChatResponse
+                        val otherPerson = body.otherPerson
+                        personDao.insert(otherPerson)
+                        chatDao.insert(Chat(id = body.id, type = body.type))
+                        StateHolder(state = ChatUiState(
+                            otherPerson.getFullName(),
+                            FormatHelper.formatLastOnline(otherPerson.onlineAt, context)
+                        ))
+                    }
 
-        if (isOnline()) {
-            when(type) {
-                ChatType.PRIVATE -> {
-                    val response = api.getPrivateChat(id, getUserId())
-                    val otherPerson = response.otherPerson
-                    personDao.insert(otherPerson)
-                    uiChat = Chat(id = response.id, type = response.type,
-                        name = otherPerson.getFullName(), description = otherPerson.onlineAt.toString())
-                    chatDao.insert(Chat(id = response.id, type = response.type))
-                }
-
-                ChatType.GROUP -> {
-                    uiChat = api.getGroupChat(id)
-                    chatDao.insert(uiChat)
+                    ChatType.GROUP -> {
+                        val chat = response.body as Chat
+                        chatDao.insert(chat)
+                        StateHolder(state = ChatUiState(
+                            chat.name,
+                            context.getString(R.string.group_members_count, chat.memberCount)
+                        ))
+                    }
                 }
             }
-        } else {
-            uiChat = chatDao.get(id)
+            is NetworkResponse.NetworkError -> StateHolder(status = StateHolder.Status.NETWORK_ERROR)
+            else -> StateHolder(status = StateHolder.Status.ERROR)
         }
-
-        return uiChat
     }
 }

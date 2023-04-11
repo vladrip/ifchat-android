@@ -12,8 +12,8 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
-import com.vladrip.ifchat.Constants.PREFS_SESSION
-import com.vladrip.ifchat.Constants.PREFS_SESSION_EMAIL
+import com.vladrip.ifchat.mock.Constants.PREFS_SESSION
+import com.vladrip.ifchat.mock.Constants.PREFS_SESSION_EMAIL
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

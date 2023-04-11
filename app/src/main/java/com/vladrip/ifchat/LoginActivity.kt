@@ -7,8 +7,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
-import com.vladrip.ifchat.Constants.PREFS_SESSION
-import com.vladrip.ifchat.Constants.PREFS_SESSION_EMAIL
+import com.vladrip.ifchat.mock.Constants.PREFS_SESSION
+import com.vladrip.ifchat.mock.Constants.PREFS_SESSION_EMAIL
 import com.vladrip.ifchat.mock.service.MockUserService
 
 class LoginActivity : AppCompatActivity() {

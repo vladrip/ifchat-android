@@ -32,7 +32,6 @@
         android:ellipsize="end"
         android:layout_above="@id/pivot_center"
         android:layout_alignStart="@id/pivot_center"
-        android:text="@string/test_username"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="@dimen/_12ssp" />
 
@@ -45,6 +44,5 @@
         android:textColor="@color/disabled"
         android:textSize="@dimen/_10ssp"
         android:layout_below="@id/pivot_center"
-        android:layout_alignStart="@id/chat_name"
-        android:text="@string/test_list_chat_short_info" />
+        android:layout_alignStart="@id/chat_name" />
 </RelativeLayout>
