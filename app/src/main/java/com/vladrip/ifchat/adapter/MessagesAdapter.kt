@@ -1,27 +1,22 @@
 package com.vladrip.ifchat.adapter
 
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.marginEnd
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.vladrip.ifchat.R
 import com.vladrip.ifchat.model.entity.Chat.ChatType
 import com.vladrip.ifchat.model.entity.Message
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
+import com.vladrip.ifchat.utils.FormatHelper
 
 class MessagesAdapter(
     private val chatType: ChatType,
     private val userId: Long
 ) :
-    PagingDataAdapter<Message, MessagesAdapter.MessageViewHolder>(MESSAGE_COMPARATOR) {
+    PagingDataAdapter<Message, ViewHolder>(MESSAGE_COMPARATOR) {
 
     companion object {
         val MESSAGE_COMPARATOR = object : DiffUtil.ItemCallback<Message>() {
@@ -35,51 +30,54 @@ class MessagesAdapter(
         }
     }
 
-    inner class MessageViewHolder(item: View) : RecyclerView.ViewHolder(item) {
-        val messageView: ViewGroup
-        private val initialMargin: Int
-        init {
-            messageView = (item as ViewGroup).getChildAt(0) as ViewGroup
-            initialMargin = messageView.marginEnd
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val message = getItem(position)
+        if (message != null) when (holder) {
+            is MessageViewHolder -> holder.bind(message)
+            is UserMessageViewHolder -> holder.bind(message)
         }
+    }
 
-        fun bind(message: Message) {
-            messageView.findViewById<TextView>(R.id.message_content).text = message.content
-            messageView.findViewById<TextView>(R.id.message_sent_at).text = message.sentAt
-                .format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
 
-            val sender = message.sender
-            if (sender.id == userId) {
-                messageView.apply {
-                    findViewById<TextView>(R.id.message_username).visibility = View.GONE
-                    background = AppCompatResources.getDrawable(context, R.drawable.shape_bg_outgoing_bubble)
-                    //swap end and start paddings to suit shape change
-                    setPadding(paddingEnd, paddingTop, paddingStart, paddingBottom)
-                }
-                messageView.layoutParams = FrameLayout.LayoutParams(
-                    messageView.layoutParams as FrameLayout.LayoutParams
-                ).apply {
-                    marginStart = initialMargin
-                    marginEnd = 0
-                    gravity = Gravity.END
-                }
-            } else if (chatType == ChatType.GROUP) {
-                val fullName = "${sender.firstName} ${sender.lastName}"
-                messageView.findViewById<TextView>(R.id.message_username).text = fullName
+        val holder: ViewHolder = when (viewType) {
+            R.layout.message_user ->
+                UserMessageViewHolder(inflater.inflate(R.layout.message_user, parent, false))
+
+            else -> {
+                val view = inflater.inflate(R.layout.message, parent, false)
+                if (chatType == ChatType.PRIVATE)
+                    view.findViewById<TextView>(R.id.message_username).visibility = View.GONE
+                MessageViewHolder(view)
             }
         }
-    }
-
-    override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        val item = getItem(position)
-        if (item != null) holder.bind(item)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val holder = MessageViewHolder(inflater.inflate(R.layout.recycler_message, parent, false))
-        if (chatType == ChatType.PRIVATE)
-            holder.messageView.findViewById<TextView>(R.id.message_username).visibility = View.GONE
         return holder
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        val message = getItem(position)
+        return if (message != null && message.sender.id == userId)
+            R.layout.message_user
+        else R.layout.message
+    }
+
+    inner class MessageViewHolder(item: View) : ViewHolder(item) {
+        fun bind(message: Message) {
+            if (chatType != ChatType.PRIVATE)
+                itemView.findViewById<TextView>(R.id.message_username).text =
+                    message.sender.getFullName()
+            itemView.findViewById<TextView>(R.id.message_content).text = message.content
+            itemView.findViewById<TextView>(R.id.message_sent_at).text =
+                FormatHelper.formatMessageSentAt(message.sentAt)
+        }
+    }
+
+    inner class UserMessageViewHolder(item: View) : ViewHolder(item) {
+        fun bind(message: Message) {
+            itemView.findViewById<TextView>(R.id.message_content).text = message.content
+            itemView.findViewById<TextView>(R.id.message_sent_at).text =
+                FormatHelper.formatMessageSentAt(message.sentAt)
+        }
     }
 }

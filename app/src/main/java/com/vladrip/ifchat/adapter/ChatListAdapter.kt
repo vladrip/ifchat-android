@@ -38,7 +38,7 @@ class ChatListAdapter :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return ChatViewHolder(inflater.inflate(R.layout.recyler_chat, parent, false))
+        return ChatViewHolder(inflater.inflate(R.layout.chat_list_element, parent, false))
     }
 
     inner class ChatViewHolder(item: View) : RecyclerView.ViewHolder(item) {

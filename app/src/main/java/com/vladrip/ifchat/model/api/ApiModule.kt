@@ -17,6 +17,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object ApiModule {
     //10.0.2.2 for emulator, localhost for hardware. Will be changed to real url when server will be hosted
+    //After connecting real device execute this command to forward server port:
+    //C:\Users\{your user name}\AppData\Local\Android\Sdk\platform-tools\adb.exe reverse tcp:8080 tcp:8080
     private val BASE_URL =
         if (Build.PRODUCT.contains("sdk")) "http://10.0.2.2:8080/api/v1/" else "http://localhost:8080/api/v1/"
 

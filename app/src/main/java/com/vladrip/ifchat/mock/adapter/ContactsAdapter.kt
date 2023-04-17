@@ -1,6 +1,5 @@
 package com.vladrip.ifchat.mock.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,12 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.vladrip.ifchat.R
 import com.vladrip.ifchat.mock.dto.Contact
 
-class ContactsAdapter(private var contacts: List<Contact>, private var c: Context) :
+class ContactsAdapter(private var contacts: List<Contact>) :
     RecyclerView.Adapter<ContactsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return ViewHolder(inflater.inflate(R.layout.recyler_chat, parent, false))
+        return ViewHolder(inflater.inflate(R.layout.chat_list_element, parent, false))
     }
 
     override fun getItemCount(): Int {

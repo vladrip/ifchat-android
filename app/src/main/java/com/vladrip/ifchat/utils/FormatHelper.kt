@@ -66,4 +66,8 @@ object FormatHelper {
         }
         return dateTime.format(formatter)
     }
+
+    fun formatMessageSentAt(dateTime: LocalDateTime): String {
+        return dateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
+    }
 }

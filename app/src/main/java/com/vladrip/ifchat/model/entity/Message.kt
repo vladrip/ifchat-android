@@ -26,5 +26,9 @@ data class Message(
         val id: Long,
         val firstName: String,
         val lastName: String
-    )
+    ) {
+        fun getFullName(): String {
+            return "$firstName $lastName"
+        }
+    }
 }
