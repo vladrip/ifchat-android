@@ -12,5 +12,5 @@ interface ChatDao {
     suspend fun insert(chat: Chat)
 
     @Query("SELECT * FROM Chat c WHERE id = :id")
-    fun get(id: Long): Chat
+    suspend fun get(id: Long): Chat?
 }

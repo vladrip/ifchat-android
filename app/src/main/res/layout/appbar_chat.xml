@@ -28,21 +28,20 @@
         android:id="@+id/chat_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:ellipsize="end"
         android:layout_above="@id/pivot_center"
         android:layout_alignStart="@id/pivot_center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textSize="@dimen/_12ssp" />
 
     <TextView
         android:id="@+id/chat_short_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textColor="@color/disabled"
-        android:textSize="@dimen/_10ssp"
         android:layout_below="@id/pivot_center"
-        android:layout_alignStart="@id/chat_name" />
+        android:layout_alignStart="@id/chat_name"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/disabled"
+        android:textSize="@dimen/_10ssp" />
 </RelativeLayout>

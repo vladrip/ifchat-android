@@ -14,7 +14,7 @@ import retrofit2.http.Query
 
 interface IFChatApi {
 
-    class ErrorResponse (
+    class ErrorResponse(
         val status: Int,
         val error: String
     )
@@ -22,6 +22,7 @@ interface IFChatApi {
     class ChatListResponse(
         val content: List<ChatListEl>
     )
+
     @GET("chats")
     suspend fun getChatList(
         @Query("personId") personId: Long,
@@ -34,6 +35,7 @@ interface IFChatApi {
         val type: ChatType,
         val otherPerson: Person
     )
+
     @GET("chats/p{id}")
     suspend fun getPrivateChat(
         @Path("id") id: Long,

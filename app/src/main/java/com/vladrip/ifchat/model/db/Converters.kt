@@ -10,6 +10,7 @@ object Converters {
     fun fromTimestamp(value: Long?): LocalDateTime? {
         return value?.let { LocalDateTime.ofInstant(Instant.ofEpochMilli(value), ZoneOffset.UTC) }
     }
+
     @TypeConverter
     fun toTimestamp(date: LocalDateTime?): Long? {
         return date?.atZone(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()

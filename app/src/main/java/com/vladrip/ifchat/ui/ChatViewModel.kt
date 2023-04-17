@@ -15,6 +15,7 @@ import com.vladrip.ifchat.ui.state.ChatUiState
 import com.vladrip.ifchat.ui.state.StateHolder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,15 +23,22 @@ class ChatViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val chatRepository: ChatRepository,
     private val messageRepository: MessageRepository
-): ViewModel() {
-    //TODO: flow or livedata
-    suspend fun getChatById(id: Long, type: Chat.ChatType, context: Context): ChatUiState {
-        val chatStateHolder = chatRepository.getChatById(id, type, context)
-        return when(chatStateHolder.status) {
-            StateHolder.Status.SUCCESS -> chatStateHolder.state!!
-            StateHolder.Status.NETWORK_ERROR -> ChatUiState(context.getString(R.string.waiting_for_network))
-            StateHolder.Status.LOADING -> ChatUiState(context.getString(R.string.loading))
-            StateHolder.Status.ERROR -> ChatUiState(context.getString(R.string.unknown))
+) : ViewModel() {
+
+    fun getChatById(id: Long, type: Chat.ChatType, context: Context): Flow<ChatUiState> {
+        val chatStateHolder = when (type) {
+            Chat.ChatType.PRIVATE -> chatRepository.getPrivateChatById(id, context)
+            Chat.ChatType.GROUP -> chatRepository.getGroupById(id, context)
+        }
+        return chatStateHolder.map {
+            when (it.status) {
+                StateHolder.Status.SUCCESS -> it.state!!
+                StateHolder.Status.NETWORK_ERROR ->
+                    ChatUiState(shortInfo = context.getString(R.string.waiting_for_network))
+
+                StateHolder.Status.LOADING -> ChatUiState(shortInfo = context.getString(R.string.loading))
+                StateHolder.Status.ERROR -> ChatUiState(shortInfo = context.getString(R.string.unknown))
+            }
         }
     }
 

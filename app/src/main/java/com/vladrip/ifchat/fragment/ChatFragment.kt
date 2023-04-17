@@ -23,10 +23,8 @@ import com.vladrip.ifchat.model.entity.Chat.ChatType
 import com.vladrip.ifchat.ui.ChatViewModel
 import com.vladrip.ifchat.ui.state.ChatUiState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class ChatFragment : Fragment(), MenuProvider {
@@ -57,16 +55,16 @@ class ChatFragment : Fragment(), MenuProvider {
             ?.let { ChatType.valueOf(it) }
             ?: ChatType.GROUP
 
-        initAppBar() //TODO: real user phone number
-        adapter = MessagesAdapter(chatType, "+380 99 301 1337")
+        initAppBar()
+        //TODO: get user id (store in app context if authenticated?)
+        adapter = MessagesAdapter(chatType, 1)
         binding.messages.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                val chat = withContext(Dispatchers.Default) {
-                    chatViewModel.getChatById(chatId, chatType, requireContext())
+                chatViewModel.getChatById(chatId, chatType, requireContext()).collectLatest {
+                    fillAppBar(it)
                 }
-                fillAppBar(chat)
             }
         }
 
@@ -81,7 +79,7 @@ class ChatFragment : Fragment(), MenuProvider {
 
     private fun initAppBar() {
         appbar = layoutInflater.inflate(R.layout.appbar_chat, binding.root, false)
-        appbar.findViewById<TextView>(R.id.chat_name).text = getString(R.string.loading)
+        appbar.findViewById<TextView>(R.id.chat_short_info).text = getString(R.string.loading)
 
         (requireActivity() as AppCompatActivity).supportActionBar?.run {
             setDisplayShowCustomEnabled(true)
@@ -90,8 +88,9 @@ class ChatFragment : Fragment(), MenuProvider {
     }
 
     private fun fillAppBar(chat: ChatUiState) {
-        appbar.findViewById<TextView>(R.id.chat_name).text = chat.name
-        appbar.findViewById<TextView>(R.id.chat_short_info).text = chat.shortInfo
+        if (chat.name != null) appbar.findViewById<TextView>(R.id.chat_name).text = chat.name
+        if (chat.shortInfo != null) appbar.findViewById<TextView>(R.id.chat_short_info).text =
+            chat.shortInfo
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {

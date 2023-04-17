@@ -15,6 +15,7 @@ import com.vladrip.ifchat.utils.FormatHelper
 
 class ChatListAdapter :
     PagingDataAdapter<ChatListEl, ChatListAdapter.ChatViewHolder>(CHAT_LIST_ELEMENT_COMPARATOR) {
+
     companion object {
         val CHAT_LIST_ELEMENT_COMPARATOR = object : DiffUtil.ItemCallback<ChatListEl>() {
             override fun areContentsTheSame(oldItem: ChatListEl, newItem: ChatListEl): Boolean {

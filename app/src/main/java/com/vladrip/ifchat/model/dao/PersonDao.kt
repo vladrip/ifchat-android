@@ -12,5 +12,5 @@ interface PersonDao {
     fun insert(person: Person)
 
     @Query("SELECT * FROM Person WHERE id = :id")
-    fun get(id: Long): Person
+    fun get(id: Long): Person?
 }

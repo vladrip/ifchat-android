@@ -22,8 +22,10 @@ object FormatHelper {
                 val yearDiff = dateTime.year - now.year
                 return if (yearDiff == 1)
                     context.getString(R.string.last_online, context.getString(R.string.last_year))
-                else context.getString(R.string.last_online,
-                    "$yearDiff ${context.getString(R.string.years_ago)}")
+                else context.getString(
+                    R.string.last_online,
+                    "$yearDiff ${context.getString(R.string.years_ago)}"
+                )
             }
 
             dateTime.month.value != now.month.value ||
@@ -37,8 +39,10 @@ object FormatHelper {
                 context.getString(R.string.last_online_at, format(dateTime, "hh:ss"))
 
             dateTime.minute != now.minute ->
-                context.getString(R.string.last_online,
-                    "${dateTime.minute} ${context.getString(R.string.ago)}")
+                context.getString(
+                    R.string.last_online,
+                    "${dateTime.minute} ${context.getString(R.string.ago)}"
+                )
 
             else -> return "online"
         }

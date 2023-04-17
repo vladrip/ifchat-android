@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:padding="@dimen/_20sdp"
+    android:padding="@dimen/_16sdp"
     android:theme="@style/Theme.IFChat.Elevated">
 
     <com.google.android.material.imageview.ShapeableImageView

@@ -18,8 +18,8 @@ import androidx.room.PrimaryKey
     indices = [Index("chatId"), Index("personId")]
 )
 data class ChatMember(
-    @PrimaryKey(autoGenerate = true) val id: Long,
-    val chatMuted: Boolean,
+    @PrimaryKey val id: Long,
     val chatId: Long,
-    val personId: Long
+    val personId: Long,
+    val chatMuted: Boolean = false
 )

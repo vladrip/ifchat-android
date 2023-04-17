@@ -13,7 +13,7 @@ interface MessageDao {
     suspend fun insertAll(messages: List<Message>)
 
     @Query("SELECT * FROM Message WHERE chatId = :chatId ORDER BY id desc")
-    fun getMessages(chatId: Long) : PagingSource<Int, Message>
+    fun getMessages(chatId: Long): PagingSource<Int, Message>
 
     @Query("DELETE FROM Message WHERE chatId = :chatId")
     fun clear(chatId: Long)

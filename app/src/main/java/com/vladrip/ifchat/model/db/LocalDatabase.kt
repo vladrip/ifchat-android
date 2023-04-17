@@ -22,8 +22,7 @@ import com.vladrip.ifchat.model.entity.Person
         ChatMember::class, ChatMemberShort::class,
         Message::class,
         Person::class],
-    version = 1,
-    exportSchema = false
+    version = 1
 )
 abstract class LocalDatabase : RoomDatabase() {
     abstract fun chatDao(): ChatDao

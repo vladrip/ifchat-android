@@ -4,15 +4,17 @@ import android.content.Context
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.room.withTransaction
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.vladrip.ifchat.R
 import com.vladrip.ifchat.model.api.IFChatApi
 import com.vladrip.ifchat.model.db.LocalDatabase
 import com.vladrip.ifchat.model.entity.Chat
-import com.vladrip.ifchat.model.entity.Chat.ChatType
 import com.vladrip.ifchat.ui.state.ChatUiState
 import com.vladrip.ifchat.ui.state.StateHolder
 import com.vladrip.ifchat.utils.FormatHelper
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,37 +37,67 @@ class ChatRepository @Inject constructor(
         chatListDao.getOrderByLatestMsg()
     }.flow
 
-    suspend fun getChatById(id: Long, type: ChatType, context: Context): StateHolder<ChatUiState> {
-        val response = when(type) {
-            ChatType.PRIVATE -> api.getPrivateChat(id, getUserId())
-            ChatType.GROUP -> api.getGroupChat(id)
-        }
-        return when(response) {
-            is NetworkResponse.Success -> {
-                return when(type) {
-                    ChatType.PRIVATE -> {
-                        val body = response.body as IFChatApi.PrivateChatResponse
-                        val otherPerson = body.otherPerson
-                        personDao.insert(otherPerson)
-                        chatDao.insert(Chat(id = body.id, type = body.type))
-                        StateHolder(state = ChatUiState(
-                            otherPerson.getFullName(),
-                            FormatHelper.formatLastOnline(otherPerson.onlineAt, context)
-                        ))
-                    }
+    fun getPrivateChatById(id: Long, context: Context): Flow<StateHolder<ChatUiState>> = flow {
+        val localChat = chatDao.get(id)
+        if (localChat != null)
+            emit(StateHolder(state = ChatUiState(name = localChat.name)))
 
-                    ChatType.GROUP -> {
-                        val chat = response.body as Chat
-                        chatDao.insert(chat)
-                        StateHolder(state = ChatUiState(
-                            chat.name,
-                            context.getString(R.string.group_members_count, chat.memberCount)
-                        ))
-                    }
+        val response = api.getPrivateChat(id, getUserId())
+        emit(when (response) {
+            is NetworkResponse.Success -> {
+                val body = response.body
+                val otherPerson = body.otherPerson
+                val fullName = otherPerson.getFullName()
+                localDb.withTransaction {
+                    personDao.insert(otherPerson)
+                    chatDao.insert(Chat(id = body.id, type = body.type, name = fullName))
                 }
+                StateHolder(
+                    state = ChatUiState(
+                        name = fullName,
+                        shortInfo = FormatHelper.formatLastOnline(otherPerson.onlineAt, context)
+                    )
+                )
             }
+
             is NetworkResponse.NetworkError -> StateHolder(status = StateHolder.Status.NETWORK_ERROR)
             else -> StateHolder(status = StateHolder.Status.ERROR)
-        }
+        })
+    }
+
+    fun getGroupById(id: Long, context: Context): Flow<StateHolder<ChatUiState>> = flow {
+        val localChat = chatDao.get(id)
+        if (localChat != null)
+            emit(
+                StateHolder(
+                    state = ChatUiState(
+                        name = localChat.name,
+                        shortInfo = context.getString(
+                            R.string.group_members_count,
+                            localChat.memberCount
+                        )
+                    )
+                )
+            )
+
+        val response = api.getGroupChat(id)
+        emit(when (response) {
+            is NetworkResponse.Success -> {
+                val chat = response.body
+                localDb.withTransaction { chatDao.insert(chat) }
+                StateHolder(
+                    state = ChatUiState(
+                        name = chat.name,
+                        shortInfo = context.getString(
+                            R.string.group_members_count,
+                            chat.memberCount
+                        )
+                    )
+                )
+            }
+
+            is NetworkResponse.NetworkError -> StateHolder(status = StateHolder.Status.NETWORK_ERROR)
+            else -> StateHolder(status = StateHolder.Status.ERROR)
+        })
     }
 }

@@ -8,4 +8,8 @@
     <style name="Theme.IFChat.Elevated" parent="Theme.IFChat">
         <item name="android:background">@color/palette2</item>
     </style>
+
+    <style name="Theme.IFChat.Transparent" parent="Theme.IFChat">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
 </resources>

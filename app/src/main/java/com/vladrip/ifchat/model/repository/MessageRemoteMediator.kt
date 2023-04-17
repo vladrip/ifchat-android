@@ -31,15 +31,20 @@ class MessageRemoteMediator(
         Log.i("MESSAGE_REMOTE_MEDIATOR", "load($loadType, ${state.pages})")
         val loadKey: Long = when (loadType) {
             LoadType.REFRESH -> {
-                val anchorMsgId = state.anchorPosition?.let { state.closestItemToPosition(it)?.id ?: 0 }
-                    ?: localDb.withTransaction { localDb.chatListDao().getLastMsgIdByChatId(chatId) }
+                val anchorMsgId =
+                    state.anchorPosition?.let { state.closestItemToPosition(it)?.id ?: 0 }
+                        ?: localDb.withTransaction {
+                            localDb.chatListDao().getLastMsgIdByChatId(chatId)
+                        }
                 anchorMsgId
             }
+
             LoadType.PREPEND -> {
                 val oldestSeenMsg = state.firstItemOrNull()
                     ?: return MediatorResult.Success(endOfPaginationReached = true)
                 oldestSeenMsg.id
             }
+
             LoadType.APPEND -> {
                 val newestSeenMsg = state.lastItemOrNull()
                     ?: return MediatorResult.Success(endOfPaginationReached = true)
@@ -52,8 +57,8 @@ class MessageRemoteMediator(
             val isRefresh = loadType == LoadType.REFRESH
             val messages = api.getMessages(
                 chatId,
-                afterId = if(loadType == LoadType.APPEND || isRefresh) loadKey else 0,
-                beforeId = if(loadType == LoadType.PREPEND || isRefresh) loadKey else 0
+                afterId = if (loadType == LoadType.APPEND || isRefresh) loadKey else 0,
+                beforeId = if (loadType == LoadType.PREPEND || isRefresh) loadKey else 0
             )
 
             localDb.withTransaction {

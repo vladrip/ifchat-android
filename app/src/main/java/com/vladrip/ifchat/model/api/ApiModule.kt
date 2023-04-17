@@ -1,5 +1,6 @@
 package com.vladrip.ifchat.model.api
 
+import android.os.Build
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import com.haroldadmin.cnradapter.NetworkResponseAdapterFactory
@@ -15,7 +16,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ApiModule {
-    private const val BASE_URL = "http://localhost:8080/api/v1/"
+    //10.0.2.2 for emulator, localhost for hardware. Will be changed to real url when server will be hosted
+    private val BASE_URL =
+        if (Build.PRODUCT.contains("sdk")) "http://10.0.2.2:8080/api/v1/" else "http://localhost:8080/api/v1/"
 
     @Provides
     @Singleton
