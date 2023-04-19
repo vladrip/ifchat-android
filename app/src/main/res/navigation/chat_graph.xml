@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/fragment_chat"
-        android:name="com.vladrip.ifchat.fragment.ChatFragment"
+        android:name="com.vladrip.ifchat.ui.fragment.ChatFragment"
         tools:layout="@layout/fragment_chat">
         <deepLink
             android:id="@+id/chat_deeplink"

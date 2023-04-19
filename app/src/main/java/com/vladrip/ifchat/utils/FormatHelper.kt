@@ -70,4 +70,14 @@ object FormatHelper {
     fun formatMessageSentAt(dateTime: LocalDateTime): String {
         return dateTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))
     }
+
+    fun formatDateSeparator(dateTime: LocalDateTime): String {
+        val now = LocalDateTime.now()
+        val formatter: DateTimeFormatter = when {
+            dateTime.year != now.year ->
+                DateTimeFormatter.ofPattern("LLLL d, yyyy")
+            else -> DateTimeFormatter.ofPattern("LLLL d")
+        }
+        return dateTime.format(formatter).replaceFirstChar { c -> c.uppercase() }
+    }
 }

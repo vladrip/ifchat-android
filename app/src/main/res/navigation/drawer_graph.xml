@@ -9,7 +9,7 @@
 
     <fragment
         android:id="@+id/fragment_chat_list"
-        android:name="com.vladrip.ifchat.fragment.ChatListFragment"
+        android:name="com.vladrip.ifchat.ui.fragment.ChatListFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_chat_list">
         <action
@@ -19,11 +19,11 @@
 
     <fragment
         android:id="@+id/fragment_contacts"
-        android:name="com.vladrip.ifchat.fragment.ContactsFragment"
+        android:name="com.vladrip.ifchat.ui.fragment.ContactsFragment"
         android:label="@string/contacts" />
 
     <fragment
         android:id="@+id/fragment_settings"
-        android:name="com.vladrip.ifchat.fragment.SettingsFragment"
+        android:name="com.vladrip.ifchat.ui.fragment.SettingsFragment"
         android:label="@string/settings" />
 </navigation>
