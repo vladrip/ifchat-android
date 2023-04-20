@@ -10,6 +10,7 @@ import com.vladrip.ifchat.R
 import com.vladrip.ifchat.api.IFChatApi
 import com.vladrip.ifchat.db.LocalDatabase
 import com.vladrip.ifchat.model.Chat
+import com.vladrip.ifchat.model.Message
 import com.vladrip.ifchat.ui.state.ChatUiState
 import com.vladrip.ifchat.ui.state.StateHolder
 import com.vladrip.ifchat.utils.FormatHelper
@@ -52,8 +53,7 @@ class ChatRepository @Inject constructor(
                     personDao.insert(otherPerson)
                     chatDao.insert(Chat(id = body.id, type = body.type, name = fullName))
                 }
-                StateHolder(
-                    state = ChatUiState(
+                StateHolder(state = ChatUiState(
                         name = fullName,
                         shortInfo = FormatHelper.formatLastOnline(otherPerson.onlineAt, context)
                     )
@@ -69,8 +69,7 @@ class ChatRepository @Inject constructor(
         val localChat = chatDao.get(id)
         if (localChat != null)
             emit(
-                StateHolder(
-                    state = ChatUiState(
+                StateHolder(state = ChatUiState(
                         name = localChat.name,
                         shortInfo = context.getString(
                             R.string.group_members_count,
@@ -85,8 +84,7 @@ class ChatRepository @Inject constructor(
             is NetworkResponse.Success -> {
                 val chat = response.body
                 localDb.withTransaction { chatDao.insert(chat) }
-                StateHolder(
-                    state = ChatUiState(
+                StateHolder(state = ChatUiState(
                         name = chat.name,
                         shortInfo = context.getString(
                             R.string.group_members_count,

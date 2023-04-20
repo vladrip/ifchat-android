@@ -62,6 +62,7 @@ class MessageRemoteMediator(
             )
 
             localDb.withTransaction {
+                if (isRefresh) messageDao.clear(chatId)
                 messageDao.insertAll(messages)
             }
             return MediatorResult.Success(endOfPaginationReached = messages.isEmpty())

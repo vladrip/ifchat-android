@@ -17,6 +17,7 @@ import com.vladrip.ifchat.utils.FormatHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +26,8 @@ class ChatViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
     private val messageRepository: MessageRepository
 ) : ViewModel() {
+    val chatId: Long = savedStateHandle["chatId"]!!
+    val chatType: Chat.ChatType = savedStateHandle["chatType"]!!
 
     fun getChatById(id: Long, type: Chat.ChatType, context: Context): Flow<ChatUiState> {
         val chatStateHolder = when (type) {
@@ -57,6 +60,16 @@ class ChatViewModel @Inject constructor(
                     } else null
                 }
             }
+
+    suspend fun sendMessage(text: String) {
+        val message = Message(
+            chatId = chatId,
+            sentAt = LocalDateTime.now(),
+            sender = Message.Sender(id = chatRepository.getUserId()),
+            content = text
+        )
+        messageRepository.saveMessage(message)
+    }
 }
 
 sealed class UiModel {

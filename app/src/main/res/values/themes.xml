@@ -1,15 +1,12 @@
 <resources>
-    <!-- Base application theme. -->
     <style name="Theme.IFChat" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name="android:background">@color/palette1</item>
-        <item name="android:textColor">@color/white</item>
-    </style>
-
-    <style name="Theme.IFChat.Elevated" parent="Theme.IFChat">
-        <item name="android:background">@color/palette2</item>
-    </style>
-
-    <style name="Theme.IFChat.Transparent" parent="Theme.IFChat">
         <item name="android:background">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/palette1</item>
+        <item name="colorPrimary">@color/palette1</item>
+        <item name="android:textColorPrimary">@color/palette1</item>
+        <item name="android:textColor">@color/palette4</item>
+        <item name="android:textColorHint">@color/palette4</item>
+        <item name="android:editTextColor">@color/palette4</item>
     </style>
 </resources>

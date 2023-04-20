@@ -58,4 +58,6 @@
     <string name="mute_notifications">Mute Notifications</string>
     <string name="test_list_chat_short_info">Newest message in chat</string>
     <string name="test_chat_last_msg_time">14:52</string>
+    <string name="message_input_hint">Message</string>
+    <string name="send_message">Send message</string>
 </resources>

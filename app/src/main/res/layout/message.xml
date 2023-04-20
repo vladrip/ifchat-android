@@ -14,8 +14,7 @@
         android:paddingStart="@dimen/_12sdp"
         android:paddingEnd="@dimen/_8sdp"
         android:paddingVertical="@dimen/_4sdp"
-        android:background="@drawable/shape_bg_incoming_bubble"
-        android:theme="@style/Theme.IFChat.Transparent">
+        android:background="@drawable/shape_bg_incoming_bubble">
 
         <TextView
             android:id="@+id/message_username"

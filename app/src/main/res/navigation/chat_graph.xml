@@ -16,5 +16,9 @@
             android:name="chatId"
             android:defaultValue="-1L"
             app:argType="long" />
+        <argument
+            android:name="chatType"
+            android:defaultValue="GROUP"
+            app:argType="com.vladrip.ifchat.model.Chat$ChatType" />
     </fragment>
 </navigation>

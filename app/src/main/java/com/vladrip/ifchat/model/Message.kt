@@ -16,7 +16,7 @@ import java.time.LocalDateTime
     indices = [Index("chatId")]
 )
 data class Message(
-    @PrimaryKey val id: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val chatId: Long,
     val sentAt: LocalDateTime,
     @Embedded(prefix = "sender_") val sender: Sender,
@@ -24,8 +24,8 @@ data class Message(
 ) {
     data class Sender(
         val id: Long,
-        val firstName: String,
-        val lastName: String
+        val firstName: String? = null,
+        val lastName: String? = null
     ) {
         fun getFullName(): String {
             return "$firstName $lastName"

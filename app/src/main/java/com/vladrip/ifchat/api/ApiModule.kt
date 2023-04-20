@@ -3,6 +3,8 @@ package com.vladrip.ifchat.api
 import android.os.Build
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializer
 import com.haroldadmin.cnradapter.NetworkResponseAdapterFactory
 import dagger.Module
 import dagger.Provides
@@ -28,9 +30,11 @@ object ApiModule {
         val gson = GsonBuilder()
             .registerTypeAdapter(
                 LocalDateTime::class.java,
-                JsonDeserializer { json, _, _ -> LocalDateTime.parse(json.asString) }
-            )
-            .create()
+                JsonDeserializer { json, _, _ -> LocalDateTime.parse(json.asString) },
+            ).registerTypeAdapter(
+                LocalDateTime::class.java,
+                JsonSerializer<LocalDateTime> { dateTime, _, _ -> JsonPrimitive(dateTime.toString()) }
+            ).create()
 
         return Retrofit.Builder()
             .baseUrl(BASE_URL)

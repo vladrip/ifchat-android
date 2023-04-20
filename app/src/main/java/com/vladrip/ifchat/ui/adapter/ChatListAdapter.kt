@@ -51,7 +51,7 @@ class ChatListAdapter :
             itemView.setOnClickListener {
                 val bundle = bundleOf(
                     "chatId" to chatListEl.chatId,
-                    "chatType" to chatListEl.chatType.toString()
+                    "chatType" to chatListEl.chatType
                 )
                 itemView.findNavController().navigate(R.id.action_chat_list_to_chat, bundle)
             }
