@@ -20,13 +20,14 @@ import javax.inject.Singleton
 object ApiModule {
     //10.0.2.2 for emulator, localhost for hardware. Will be changed to real url when server will be hosted
     //After connecting real device execute this command to forward server port:
-    //C:\Users\{your user name}\AppData\Local\Android\Sdk\platform-tools\adb.exe reverse tcp:8080 tcp:8080
+    //adb reverse tcp:8080 tcp:8080
+    //adb is located in C:\Users\{your user name}\AppData\Local\Android\Sdk\platform-tools
     private val BASE_URL =
         if (Build.PRODUCT.contains("sdk")) "http://10.0.2.2:8080/api/v1/" else "http://localhost:8080/api/v1/"
 
     @Provides
     @Singleton
-    fun provideIFChatApi(): IFChatApi {
+    fun provideIFChatService(): IFChatService {
         val gson = GsonBuilder()
             .registerTypeAdapter(
                 LocalDateTime::class.java,
@@ -41,6 +42,6 @@ object ApiModule {
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(NetworkResponseAdapterFactory())
             .build()
-            .create(IFChatApi::class.java)
+            .create(IFChatService::class.java)
     }
 }

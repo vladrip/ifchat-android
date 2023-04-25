@@ -9,7 +9,7 @@ data class Chat(
     val type: ChatType = ChatType.PRIVATE,
     val name: String? = "",
     val description: String? = "",
-    val memberCount: Int = 2
+    val memberCount: Int = 2,
 ) {
     enum class ChatType {
         PRIVATE,

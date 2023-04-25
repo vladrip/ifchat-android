@@ -21,5 +21,5 @@ data class ChatMember(
     @PrimaryKey val id: Long,
     val chatId: Long,
     val personId: Long,
-    val chatMuted: Boolean = false
+    val chatMuted: Boolean = false,
 )

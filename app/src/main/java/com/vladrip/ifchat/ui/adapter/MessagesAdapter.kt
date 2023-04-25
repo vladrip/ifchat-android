@@ -3,6 +3,7 @@ package com.vladrip.ifchat.ui.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -12,29 +13,12 @@ import com.vladrip.ifchat.model.Chat.ChatType
 import com.vladrip.ifchat.model.Message
 import com.vladrip.ifchat.ui.viewmodel.UiModel
 import com.vladrip.ifchat.utils.FormatHelper
-import java.lang.IllegalArgumentException
 
 class MessagesAdapter(
     private val chatType: ChatType,
-    private val userId: Long
-) :
-    PagingDataAdapter<UiModel, ViewHolder>(UI_MODEL_COMPARATOR) {
-
-    companion object {
-        val UI_MODEL_COMPARATOR = object : DiffUtil.ItemCallback<UiModel>() {
-            override fun areContentsTheSame(oldItem: UiModel, newItem: UiModel): Boolean {
-                return if (oldItem is UiModel.MessageItem && newItem is UiModel.MessageItem)
-                    compareBy<Message>({ it.sentAt }, { it.content })
-                        .compare(oldItem.message, newItem.message) == 0
-                else if (oldItem is UiModel.DateSeparator && newItem is UiModel.DateSeparator)
-                    oldItem.formattedDate == newItem.formattedDate
-                else false
-            }
-
-            override fun areItemsTheSame(oldItem: UiModel, newItem: UiModel): Boolean =
-                oldItem == newItem
-        }
-    }
+    private val userId: Long,
+    private val onMessageClick: View.OnClickListener,
+) : PagingDataAdapter<UiModel, ViewHolder>(UI_MODEL_COMPARATOR) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val uiModel = getItem(position)
@@ -43,7 +27,7 @@ class MessagesAdapter(
             is UserMessageViewHolder -> holder.bind(uiModel.message)
         }
         else if (uiModel is UiModel.DateSeparator)
-                (holder as DateSeparatorViewHolder).bind(uiModel.formattedDate)
+            (holder as DateSeparatorViewHolder).bind(uiModel.formattedDate)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -83,20 +67,34 @@ class MessagesAdapter(
         private val sentAt = view.findViewById<TextView>(R.id.message_sent_at)
 
         fun bind(message: Message) {
-            if (chatType != ChatType.PRIVATE)
-                username.text = message.sender.getFullName()
+            if (chatType != ChatType.PRIVATE) username.text = message.sender.getFullName()
             content.text = message.content
             sentAt.text = FormatHelper.formatMessageSentAt(message.sentAt)
         }
     }
 
     inner class UserMessageViewHolder(view: View) : ViewHolder(view) {
+        private val body = (itemView as ViewGroup).getChildAt(0)
         private val content = view.findViewById<TextView>(R.id.message_content)
         private val sentAt = view.findViewById<TextView>(R.id.message_sent_at)
+        private val status = view.findViewById<ImageView>(R.id.message_status)
+
+        init {
+            body.setOnClickListener(onMessageClick)
+        }
 
         fun bind(message: Message) {
+            body.tag = message.id
             content.text = message.content
             sentAt.text = FormatHelper.formatMessageSentAt(message.sentAt)
+            status.setImageResource(
+                when (message.status) {
+                    Message.Status.SENDING -> R.drawable.message_sending
+                    Message.Status.SENT -> R.drawable.message_sent
+                    Message.Status.DELETING -> R.drawable.delete
+                    else -> R.drawable.message_read
+                }
+            )
         }
     }
 
@@ -105,6 +103,23 @@ class MessagesAdapter(
 
         fun bind(formattedDate: String) {
             date.text = formattedDate
+        }
+    }
+
+    companion object {
+        val UI_MODEL_COMPARATOR = object : DiffUtil.ItemCallback<UiModel>() {
+            override fun areItemsTheSame(oldItem: UiModel, newItem: UiModel): Boolean =
+                if (oldItem is UiModel.MessageItem && newItem is UiModel.MessageItem)
+                    oldItem.message.id == newItem.message.id
+                else oldItem == newItem
+
+            override fun areContentsTheSame(oldItem: UiModel, newItem: UiModel): Boolean =
+                if (oldItem is UiModel.MessageItem && newItem is UiModel.MessageItem)
+                    compareBy<Message>({ it.status }, { it.sentAt }, { it.content })
+                        .compare(oldItem.message, newItem.message) == 0
+                else if (oldItem is UiModel.DateSeparator && newItem is UiModel.DateSeparator)
+                    oldItem.formattedDate == newItem.formattedDate
+                else false
         }
     }
 }

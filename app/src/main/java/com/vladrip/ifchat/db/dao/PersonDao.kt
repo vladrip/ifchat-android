@@ -9,7 +9,7 @@ import com.vladrip.ifchat.model.Person
 @Dao
 interface PersonDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(person: Person)
+    suspend fun insert(person: Person)
 
     @Query("SELECT * FROM Person WHERE id = :id")
     fun get(id: Long): Person?

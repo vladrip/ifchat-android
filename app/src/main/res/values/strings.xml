@@ -21,7 +21,7 @@
     <string name="group_members_count">%d members</string>
     <string name="loading">loading…</string>
     <string name="unknown">unknown</string>
-    <string name="waiting_for_network">Waiting for network…</string>
+    <string name="waiting_for_network">waiting for network…</string>
 
     <!-- DateTime -->
     <string name="last_online">last online %s</string>
@@ -60,4 +60,6 @@
     <string name="test_chat_last_msg_time">14:52</string>
     <string name="message_input_hint">Message</string>
     <string name="send_message">Send message</string>
+    <string name="message_status">message status</string>
+    <string name="delete">Delete</string>
 </resources>

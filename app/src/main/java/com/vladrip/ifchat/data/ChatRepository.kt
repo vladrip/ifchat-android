@@ -7,10 +7,9 @@ import androidx.paging.PagingConfig
 import androidx.room.withTransaction
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.vladrip.ifchat.R
-import com.vladrip.ifchat.api.IFChatApi
+import com.vladrip.ifchat.api.IFChatService
 import com.vladrip.ifchat.db.LocalDatabase
 import com.vladrip.ifchat.model.Chat
-import com.vladrip.ifchat.model.Message
 import com.vladrip.ifchat.ui.state.ChatUiState
 import com.vladrip.ifchat.ui.state.StateHolder
 import com.vladrip.ifchat.utils.FormatHelper
@@ -23,12 +22,17 @@ const val CHAT_LIST_NETWORK_PAGE_SIZE = 20
 
 @Singleton
 class ChatRepository @Inject constructor(
-    api: IFChatApi,
-    localDb: LocalDatabase
-) : BaseRepository(api, localDb) {
+    private val api: IFChatService,
+    private val localDb: LocalDatabase,
+) {
     private val chatDao = localDb.chatDao()
     private val chatListDao = localDb.chatListDao()
     private val personDao = localDb.personDao()
+
+    //@TODO: query db there and pass real person id
+    fun getUserId(): Long {
+        return 1
+    }
 
     @OptIn(ExperimentalPagingApi::class)
     fun getChatList() = Pager(
@@ -38,7 +42,7 @@ class ChatRepository @Inject constructor(
         chatListDao.getOrderByLatestMsg()
     }.flow
 
-    fun getPrivateChatById(id: Long, context: Context): Flow<StateHolder<ChatUiState>> = flow {
+    fun getPrivateById(id: Long, context: Context): Flow<StateHolder<ChatUiState>> = flow {
         val localChat = chatDao.get(id)
         if (localChat != null)
             emit(StateHolder(state = ChatUiState(name = localChat.name)))
@@ -53,7 +57,8 @@ class ChatRepository @Inject constructor(
                     personDao.insert(otherPerson)
                     chatDao.insert(Chat(id = body.id, type = body.type, name = fullName))
                 }
-                StateHolder(state = ChatUiState(
+                StateHolder(
+                    state = ChatUiState(
                         name = fullName,
                         shortInfo = FormatHelper.formatLastOnline(otherPerson.onlineAt, context)
                     )
@@ -69,7 +74,8 @@ class ChatRepository @Inject constructor(
         val localChat = chatDao.get(id)
         if (localChat != null)
             emit(
-                StateHolder(state = ChatUiState(
+                StateHolder(
+                    state = ChatUiState(
                         name = localChat.name,
                         shortInfo = context.getString(
                             R.string.group_members_count,
@@ -84,7 +90,8 @@ class ChatRepository @Inject constructor(
             is NetworkResponse.Success -> {
                 val chat = response.body
                 localDb.withTransaction { chatDao.insert(chat) }
-                StateHolder(state = ChatUiState(
+                StateHolder(
+                    state = ChatUiState(
                         name = chat.name,
                         shortInfo = context.getString(
                             R.string.group_members_count,

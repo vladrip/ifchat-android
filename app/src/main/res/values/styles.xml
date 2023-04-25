@@ -5,4 +5,12 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <style name="PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@color/palette2_2</item>
+    </style>
+
+    <style name="ActionBarPopupMenu" parent="Widget.AppCompat.ListPopupWindow">
+        <item name="popupMenuBackground">@color/palette2_2</item>
+    </style>
 </resources>

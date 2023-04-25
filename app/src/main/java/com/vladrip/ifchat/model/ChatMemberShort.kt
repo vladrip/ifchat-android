@@ -10,5 +10,5 @@ class ChatMemberShort(
     val personId: Long,
     val firstName: String,
     val lastName: String,
-    val onlineAt: LocalDateTime
+    val onlineAt: LocalDateTime,
 )

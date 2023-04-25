@@ -1,23 +1,23 @@
 package com.vladrip.ifchat.data
 
-import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import com.vladrip.ifchat.api.IFChatApi
+import androidx.room.withTransaction
+import com.haroldadmin.cnradapter.NetworkResponse
+import com.haroldadmin.cnradapter.executeWithRetry
+import com.vladrip.ifchat.api.IFChatService
 import com.vladrip.ifchat.db.LocalDatabase
 import com.vladrip.ifchat.model.Message
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-const val MESSAGE_NETWORK_PAGE_SIZE = 30
+const val MESSAGE_NETWORK_PAGE_SIZE = 25
 
 @Singleton
 class MessageRepository @Inject constructor(
-    private val api: IFChatApi,
-    private val localDb: LocalDatabase
+    private val api: IFChatService,
+    private val localDb: LocalDatabase,
 ) {
     private val messageDao = localDb.messageDao()
 
@@ -25,16 +25,55 @@ class MessageRepository @Inject constructor(
     fun getMessagesByChatId(chatId: Long) = Pager(
         config = PagingConfig(MESSAGE_NETWORK_PAGE_SIZE),
         remoteMediator = MessageRemoteMediator(api, localDb, chatId)
-        //TODO initialKey = last viewed key in chat
     ) {
-        localDb.messageDao().getMessages(chatId)
+        messageDao.getAll(chatId)
     }.flow
 
-    suspend fun saveMessage(message: Message) {
-        api.saveMessage(message)
+    suspend fun save(message: Message, createLocalTemp: Boolean) {
+        var tempId: Long = 0
+        if (createLocalTemp) {
+            localDb.withTransaction {
+                tempId = messageDao.getMaxId() + 19
+                messageDao.insert(message.copy(id = tempId))
+            }
+        }
 
-        val nextId = withContext(Dispatchers.Default) { messageDao.getMaxId() + 1 }
-        Log.i("SAVING_MESSAGE", "$nextId, ${message.content}")
-        messageDao.insert(message.copy(id = nextId))
+        val response = executeWithRetry(
+            times = Int.MAX_VALUE,
+            initialDelay = 500
+        ) { api.saveMessage(message) }
+
+        if (response is NetworkResponse.Success)
+            response.headers["Location"]
+                ?.substringAfterLast("/")
+                ?.toLongOrNull()
+                ?.also { realId ->
+                    localDb.withTransaction {
+                        if (createLocalTemp) messageDao.delete(tempId)
+                        messageDao.insert(message.copy(id = realId, status = Message.Status.SENT))
+                    }
+                }
+    }
+
+    suspend fun delete(id: Long) {
+        var isSending = false
+        localDb.withTransaction {
+            val message = messageDao.get(id)
+            if (message.status == Message.Status.SENDING) {
+                isSending = true
+                messageDao.delete(id)
+                return@withTransaction
+            }
+            messageDao.insert(message.copy(status = Message.Status.DELETING))
+        }
+        if (isSending) return
+
+        val response = executeWithRetry(
+            times = Int.MAX_VALUE,
+            initialDelay = 500,
+        ) { api.deleteMessage(id) }
+
+        if (response is NetworkResponse.Success)
+            messageDao.delete(id)
     }
 }

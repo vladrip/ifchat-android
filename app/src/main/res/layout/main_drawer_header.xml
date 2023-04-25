@@ -4,9 +4,9 @@
     android:id="@+id/headerView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/palette2"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:background="@color/palette2"
     android:padding="@dimen/_16sdp">
 
     <com.google.android.material.imageview.ShapeableImageView

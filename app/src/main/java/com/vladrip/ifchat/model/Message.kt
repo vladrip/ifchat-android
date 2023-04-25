@@ -16,19 +16,27 @@ import java.time.LocalDateTime
     indices = [Index("chatId")]
 )
 data class Message(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey val id: Long = 0,
     val chatId: Long,
     val sentAt: LocalDateTime,
     @Embedded(prefix = "sender_") val sender: Sender,
-    val content: String
+    val content: String,
+    val status: Status? = Status.READ,
 ) {
     data class Sender(
         val id: Long,
         val firstName: String? = null,
-        val lastName: String? = null
+        val lastName: String? = null,
     ) {
         fun getFullName(): String {
             return "$firstName $lastName"
         }
+    }
+
+    enum class Status {
+        SENDING,
+        SENT,
+        READ,
+        DELETING
     }
 }

@@ -76,6 +76,7 @@ object FormatHelper {
         val formatter: DateTimeFormatter = when {
             dateTime.year != now.year ->
                 DateTimeFormatter.ofPattern("LLLL d, yyyy")
+
             else -> DateTimeFormatter.ofPattern("LLLL d")
         }
         return dateTime.format(formatter).replaceFirstChar { c -> c.uppercase() }

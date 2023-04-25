@@ -6,7 +6,7 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.vladrip.ifchat.api.IFChatApi
+import com.vladrip.ifchat.api.IFChatService
 import com.vladrip.ifchat.db.LocalDatabase
 import com.vladrip.ifchat.model.Message
 import retrofit2.HttpException
@@ -14,9 +14,9 @@ import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
 class MessageRemoteMediator(
-    private val api: IFChatApi,
+    private val api: IFChatService,
     private val localDb: LocalDatabase,
-    private val chatId: Long
+    private val chatId: Long,
 ) : RemoteMediator<Int, Message>() {
     private val messageDao = localDb.messageDao()
 
@@ -26,13 +26,13 @@ class MessageRemoteMediator(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, Message>
+        state: PagingState<Int, Message>,
     ): MediatorResult {
         Log.i("MESSAGE_REMOTE_MEDIATOR", "load($loadType, ${state.pages})")
         val loadKey: Long = when (loadType) {
             LoadType.REFRESH -> {
                 val anchorMsgId =
-                    state.anchorPosition?.let { state.closestItemToPosition(it)?.id ?: 0 }
+                    state.anchorPosition?.let { state.closestItemToPosition(it)?.id }
                         ?: localDb.withTransaction {
                             localDb.chatListDao().getLastMsgIdByChatId(chatId)
                         }
@@ -61,10 +61,7 @@ class MessageRemoteMediator(
                 beforeId = if (loadType == LoadType.PREPEND || isRefresh) loadKey else 0
             )
 
-            localDb.withTransaction {
-                if (isRefresh) messageDao.clear(chatId)
-                messageDao.insertAll(messages)
-            }
+            messageDao.insertAll(messages)
             return MediatorResult.Success(endOfPaginationReached = messages.isEmpty())
         } catch (e: IOException) {
             Log.e("MESSAGE_REMOTE_MEDIATOR", "IO: $e")

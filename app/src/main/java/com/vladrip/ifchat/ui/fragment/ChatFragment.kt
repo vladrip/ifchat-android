@@ -1,14 +1,13 @@
 package com.vladrip.ifchat.ui.fragment
 
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
@@ -19,20 +18,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.navigateUp
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import com.vladrip.ifchat.R
-import com.vladrip.ifchat.ui.adapter.MessagesAdapter
 import com.vladrip.ifchat.databinding.FragmentChatBinding
-import com.vladrip.ifchat.ui.viewmodel.ChatViewModel
+import com.vladrip.ifchat.ui.adapter.MessagesAdapter
 import com.vladrip.ifchat.ui.state.ChatUiState
+import com.vladrip.ifchat.ui.viewmodel.ChatViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class ChatFragment : Fragment(), MenuProvider {
@@ -44,7 +38,7 @@ class ChatFragment : Fragment(), MenuProvider {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         requireActivity().addMenuProvider(this, viewLifecycleOwner)
         _binding = FragmentChatBinding.inflate(inflater, container, false)
@@ -61,8 +55,25 @@ class ChatFragment : Fragment(), MenuProvider {
         }
 
         initAppBar()
-        //TODO: get user id (store in app context if authenticated?)
-        adapter = MessagesAdapter(viewModel.chatType, 1)
+        //@TODO: get user id (store in app context if authenticated?)
+        adapter = MessagesAdapter(viewModel.chatType, 1) { messageView ->
+            PopupMenu(requireContext(), messageView).apply {
+                setOnMenuItemClickListener {
+                    when (it.itemId) {
+                        R.id.message_delete -> {
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                viewModel.deleteMessage(messageView.tag as Long)
+                            }
+                        }
+
+                        else -> return@setOnMenuItemClickListener false
+                    }
+                    return@setOnMenuItemClickListener true
+                }
+                inflate(R.menu.message_menu)
+                show()
+            }
+        }
         binding.messages.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -76,6 +87,9 @@ class ChatFragment : Fragment(), MenuProvider {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.getMessages(viewModel.chatId).collectLatest {
                     adapter.submitData(it)
+                    adapter.onPagesUpdatedFlow.take(1).collect {
+                        binding.messages.scrollToPosition(adapter.itemCount - 1)
+                    }
                 }
             }
         }
@@ -84,10 +98,10 @@ class ChatFragment : Fragment(), MenuProvider {
             val isSendEnabled = binding.sendMessage.isEnabled
             if (it.isNullOrBlank() && isSendEnabled) {
                 binding.sendMessage.isEnabled = false
-                binding.sendMessage.setColorFilter(Color.GRAY)
+                binding.sendMessage.visibility = View.INVISIBLE
             } else if (!isSendEnabled) {
                 binding.sendMessage.isEnabled = true
-                binding.sendMessage.colorFilter = null
+                binding.sendMessage.visibility = View.VISIBLE
             }
         }
 
@@ -96,6 +110,9 @@ class ChatFragment : Fragment(), MenuProvider {
             if (!text.isNullOrBlank() && text.length <= 4096) { //double-check to be safe
                 viewLifecycleOwner.lifecycleScope.launch {
                     viewModel.sendMessage(text.toString())
+                    adapter.onPagesUpdatedFlow.take(1).collect {
+                        binding.messages.scrollToPosition(adapter.itemCount - 1)
+                    }
                 }
             }
             text.clear()
@@ -114,8 +131,8 @@ class ChatFragment : Fragment(), MenuProvider {
 
     private fun fillAppBar(chat: ChatUiState) {
         if (chat.name != null) appbar.findViewById<TextView>(R.id.chat_name).text = chat.name
-        if (chat.shortInfo != null) appbar.findViewById<TextView>(R.id.chat_short_info).text =
-            chat.shortInfo
+        if (chat.shortInfo != null)
+            appbar.findViewById<TextView>(R.id.chat_short_info).text = chat.shortInfo
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {

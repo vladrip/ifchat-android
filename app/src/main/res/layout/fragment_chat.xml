@@ -4,47 +4,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragment.ChatFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".ui.fragment.ChatFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messages"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="bottom"
-        android:layout_weight="1"
         android:layout_marginHorizontal="@dimen/_8sdp"
+        android:layout_weight="1"
         android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:stackFromEnd="true" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/palette2"
         android:paddingStart="@dimen/_8sdp"
-        android:paddingEnd="@dimen/_4sdp"
-        android:layout_marginBottom="@dimen/_8sdp"
-        android:background="@color/palette2">
+        android:paddingEnd="@dimen/_4sdp">
 
         <EditText
             android:id="@+id/message_input"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:maxLength="4096"
-            android:maxLines="5"
-            android:hint="@string/message_input_hint"
             android:layout_weight="1"
-            android:autofillHints="@null" />
+            android:autofillHints="@null"
+            android:hint="@string/message_input_hint"
+            android:inputType="textMultiLine|textNoSuggestions"
+            android:maxLength="4096"
+            android:maxLines="5" />
 
         <ImageButton
             android:id="@+id/send_message"
             android:layout_width="@dimen/_36sdp"
             android:layout_height="@dimen/_36sdp"
-            android:src="@drawable/send"
             android:layout_gravity="bottom"
-            android:padding="@dimen/_4sdp"
             android:layout_marginStart="@dimen/_8sdp"
+            android:contentDescription="@string/send_message"
+            android:padding="@dimen/_4sdp"
             android:scaleType="fitCenter"
-            android:contentDescription="@string/send_message" />
+            android:src="@drawable/send" />
     </LinearLayout>
 </LinearLayout>

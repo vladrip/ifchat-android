@@ -9,12 +9,12 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_40sdp"
         android:layout_gravity="end"
-        android:paddingStart="@dimen/_8sdp"
-        android:paddingEnd="@dimen/_12sdp"
+        android:layout_marginStart="@dimen/_40sdp"
+        android:background="@drawable/shape_bg_outgoing_bubble"
         android:paddingVertical="@dimen/_4sdp"
-        android:background="@drawable/shape_bg_outgoing_bubble">
+        android:paddingStart="@dimen/_8sdp"
+        android:paddingEnd="@dimen/_12sdp">
 
         <TextView
             android:id="@+id/message_content"
@@ -28,10 +28,22 @@
             android:id="@+id/message_sent_at"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/disabled"
+            android:textColor="@color/palette3"
             android:textSize="@dimen/_9ssp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/message_status"
+            app:layout_constraintTop_toBottomOf="@+id/message_content"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <ImageView
+            android:id="@+id/message_status"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/message_status"
+            android:src="@drawable/message_read"
+            app:layout_constraintBottom_toBottomOf="@+id/message_sent_at"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/message_content" />
+            app:layout_constraintTop_toTopOf="@+id/message_sent_at"
+            app:tint="@color/palette3" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

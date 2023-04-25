@@ -21,7 +21,7 @@ data class Person(
     val firstName: String,
     val lastName: String?,
     val bio: String?,
-    val onlineAt: LocalDateTime
+    val onlineAt: LocalDateTime,
 ) {
     fun getFullName(): String {
         return "$firstName $lastName"

@@ -12,5 +12,9 @@ data class ChatListEl(
     val lastMsgId: Long,
     val lastMsgContent: String,
     val lastMsgSentAt: LocalDateTime,
-    val isMuted: Boolean
-)
+    val isMuted: Boolean,
+) {
+    override fun toString(): String {
+        return "chatId=$chatId"
+    }
+}

@@ -5,22 +5,22 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import androidx.room.withTransaction
-import com.vladrip.ifchat.api.IFChatApi
+import com.haroldadmin.cnradapter.NetworkResponse
+import com.haroldadmin.cnradapter.executeWithRetry
+import com.vladrip.ifchat.api.IFChatService
 import com.vladrip.ifchat.db.LocalDatabase
 import com.vladrip.ifchat.model.ChatListEl
-import com.vladrip.ifchat.model.ChatListRemoteKeys
 import retrofit2.HttpException
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
 class ChatListRemoteMediator(
-    private val api: IFChatApi,
-    private val localDb: LocalDatabase,
-    private val personId: Long
+    private val api: IFChatService,
+    localDb: LocalDatabase,
+    private val personId: Long,
 ) : RemoteMediator<Int, ChatListEl>() {
     private val chatListDao = localDb.chatListDao()
-    private val chatListRemoteKeysDao = localDb.chatListRemoteKeysDao()
+    private var totalPages: Int = 1
 
     override suspend fun initialize(): InitializeAction {
         return InitializeAction.LAUNCH_INITIAL_REFRESH
@@ -28,52 +28,42 @@ class ChatListRemoteMediator(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, ChatListEl>
+        state: PagingState<Int, ChatListEl>,
     ): MediatorResult {
-        Log.i("CHAT_LIST_REMOTE_MEDIATOR", "load($loadType, ${state.pages})")
-        val loadKey: Int = when (loadType) {
+        Log.i("CHAT_LIST_MEDIATOR", "load($loadType, ${state.pages.lastOrNull()})")
+        val nextPage: Int = when (loadType) {
             LoadType.REFRESH -> 0
             LoadType.PREPEND -> return MediatorResult.Success(true)
             LoadType.APPEND -> {
-                val remoteKeys =
-                    state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.lastOrNull()
-                        ?.let { chatListEl ->
-                            chatListRemoteKeysDao.getByChatId(chatListEl.chatId)
-                        }
-                Log.i("CHAT_LIST_REMOTE_MEDIATOR", "remoteKeys: $remoteKeys")
-                val nextKey =
-                    remoteKeys?.nextKey ?: return MediatorResult.Success(remoteKeys != null)
-                nextKey
+                val prevPage = state.pages.lastIndex
+                prevPage + 1
             }
         }
+        if (nextPage == totalPages) return MediatorResult.Success(true)
 
         try {
-            Log.i("CHAT_LIST_REMOTE_MEDIATOR", "loadKey: $loadKey")
-            val response = api.getChatList(personId, loadKey, state.config.pageSize)
-            val chatList = response.content
-            val endOfPaginationReached = chatList.isEmpty()
-            Log.i("CHAT_LIST_REMOTE_MEDIATOR", "response size: ${chatList.size}")
-            Log.i("CHAT_LIST_REMOTE_MEDIATOR", "end: $endOfPaginationReached")
-
-            localDb.withTransaction {
-                if (loadType == LoadType.REFRESH) {
-                    chatListRemoteKeysDao.clear()
-                    chatListDao.clear()
-                }
-
-                val nextKey = if (endOfPaginationReached) null else loadKey + 1
-                val remoteKeys = chatList.map {
-                    ChatListRemoteKeys(it.chatId, nextKey)
-                }
-                chatListRemoteKeysDao.insertAll(remoteKeys)
-                chatListDao.insertAll(chatList)
+            Log.i("CHAT_LIST_MEDIATOR", "totalPages: $totalPages")
+            Log.i("CHAT_LIST_MEDIATOR", "page: $nextPage")
+            val response = executeWithRetry(
+                times = Int.MAX_VALUE,
+                initialDelay = 200
+            ) {
+                api.getChatList(personId, nextPage)
             }
-            return MediatorResult.Success(endOfPaginationReached)
+
+            if (response is NetworkResponse.Success) {
+                val chatList = response.body.content
+                totalPages = response.body.totalPages
+                Log.i("CHAT_LIST_MEDIATOR", "response size: ${chatList.size}")
+                chatListDao.insertAll(chatList)
+            } else if (response is NetworkResponse.Error)
+                throw response.error ?: throw IOException("Unexpected error. NetworkError even after executeWithRetry?")
+            return MediatorResult.Success(nextPage + 1 == totalPages)
         } catch (e: IOException) {
-            Log.e("CHAT_LIST_REMOTE_MEDIATOR", "IO: $e")
+            Log.e("CHAT_REMOTE_MEDIATOR", "IO: $e")
             return MediatorResult.Error(e)
         } catch (e: HttpException) {
-            Log.e("CHAT_LIST_REMOTE_MEDIATOR", "Http: $e")
+            Log.e("CHAT_REMOTE_MEDIATOR", "Http: $e")
             return MediatorResult.Error(e)
         }
     }

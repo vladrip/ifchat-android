@@ -7,10 +7,10 @@ import androidx.paging.PagingData
 import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.vladrip.ifchat.R
-import com.vladrip.ifchat.model.Chat
-import com.vladrip.ifchat.model.Message
 import com.vladrip.ifchat.data.ChatRepository
 import com.vladrip.ifchat.data.MessageRepository
+import com.vladrip.ifchat.model.Chat
+import com.vladrip.ifchat.model.Message
 import com.vladrip.ifchat.ui.state.ChatUiState
 import com.vladrip.ifchat.ui.state.StateHolder
 import com.vladrip.ifchat.utils.FormatHelper
@@ -22,16 +22,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val chatRepository: ChatRepository,
-    private val messageRepository: MessageRepository
+    private val messageRepository: MessageRepository,
 ) : ViewModel() {
     val chatId: Long = savedStateHandle["chatId"]!!
     val chatType: Chat.ChatType = savedStateHandle["chatType"]!!
 
     fun getChatById(id: Long, type: Chat.ChatType, context: Context): Flow<ChatUiState> {
         val chatStateHolder = when (type) {
-            Chat.ChatType.PRIVATE -> chatRepository.getPrivateChatById(id, context)
+            Chat.ChatType.PRIVATE -> chatRepository.getPrivateById(id, context)
             Chat.ChatType.GROUP -> chatRepository.getGroupById(id, context)
         }
         return chatStateHolder.map {
@@ -39,6 +39,7 @@ class ChatViewModel @Inject constructor(
                 StateHolder.Status.SUCCESS -> it.state!!
                 StateHolder.Status.NETWORK_ERROR ->
                     ChatUiState(shortInfo = context.getString(R.string.waiting_for_network))
+
                 StateHolder.Status.LOADING -> ChatUiState(shortInfo = context.getString(R.string.loading))
                 StateHolder.Status.ERROR -> ChatUiState(shortInfo = context.getString(R.string.unknown))
             }
@@ -52,8 +53,8 @@ class ChatViewModel @Inject constructor(
                 it.insertSeparators { before, after ->
                     if (after == null) return@insertSeparators null
                     if (before == null) return@insertSeparators UiModel.DateSeparator(
-                            FormatHelper.formatDateSeparator(after.message.sentAt)
-                        )
+                        FormatHelper.formatDateSeparator(after.message.sentAt)
+                    )
 
                     if (after.message.sentAt.dayOfYear != before.message.sentAt.dayOfYear) {
                         UiModel.DateSeparator(FormatHelper.formatDateSeparator(after.message.sentAt))
@@ -66,9 +67,14 @@ class ChatViewModel @Inject constructor(
             chatId = chatId,
             sentAt = LocalDateTime.now(),
             sender = Message.Sender(id = chatRepository.getUserId()),
-            content = text
+            content = text,
+            status = Message.Status.SENDING,
         )
-        messageRepository.saveMessage(message)
+        messageRepository.save(message, true)
+    }
+
+    suspend fun deleteMessage(id: Long) {
+        messageRepository.delete(id)
     }
 }
 
