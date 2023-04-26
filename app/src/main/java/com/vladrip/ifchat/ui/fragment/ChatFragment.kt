@@ -25,6 +25,7 @@ import com.vladrip.ifchat.ui.state.ChatUiState
 import com.vladrip.ifchat.ui.viewmodel.ChatViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
@@ -85,7 +86,7 @@ class ChatFragment : Fragment(), MenuProvider {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.getMessages(viewModel.chatId).collectLatest {
+                viewModel.getMessages(viewModel.chatId).retry {true}.collectLatest {
                     adapter.submitData(it)
                     adapter.onPagesUpdatedFlow.take(1).collect {
                         binding.messages.scrollToPosition(adapter.itemCount - 1)

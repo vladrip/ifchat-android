@@ -52,13 +52,9 @@ class ChatViewModel @Inject constructor(
             .map {
                 it.insertSeparators { before, after ->
                     if (after == null) return@insertSeparators null
-                    if (before == null) return@insertSeparators UiModel.DateSeparator(
-                        FormatHelper.formatDateSeparator(after.message.sentAt)
-                    )
-
-                    if (after.message.sentAt.dayOfYear != before.message.sentAt.dayOfYear) {
-                        UiModel.DateSeparator(FormatHelper.formatDateSeparator(after.message.sentAt))
-                    } else null
+                    else if (before == null || after.message.sentAt.dayOfYear != before.message.sentAt.dayOfYear)
+                        UiModel.DateSeparator(FormatHelper.formatDateSeparator(after.message.sentAt)
+                    ) else null
                 }
             }
 

@@ -6,12 +6,11 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.haroldadmin.cnradapter.NetworkResponse
-import com.haroldadmin.cnradapter.executeWithRetry
 import com.vladrip.ifchat.api.IFChatService
 import com.vladrip.ifchat.db.LocalDatabase
+import com.vladrip.ifchat.exception.ServerException
+import com.vladrip.ifchat.exception.WaitingForNetworkException
 import com.vladrip.ifchat.model.ChatListEl
-import retrofit2.HttpException
-import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
 class ChatListRemoteMediator(
@@ -41,30 +40,22 @@ class ChatListRemoteMediator(
         }
         if (nextPage == totalPages) return MediatorResult.Success(true)
 
-        try {
-            Log.i("CHAT_LIST_MEDIATOR", "totalPages: $totalPages")
-            Log.i("CHAT_LIST_MEDIATOR", "page: $nextPage")
-            val response = executeWithRetry(
-                times = Int.MAX_VALUE,
-                initialDelay = 200
-            ) {
-                api.getChatList(personId, nextPage)
-            }
-
-            if (response is NetworkResponse.Success) {
+        Log.i("CHAT_LIST_MEDIATOR", "totalPages: $totalPages")
+        Log.i("CHAT_LIST_MEDIATOR", "page: $nextPage")
+        return when (val response = api.getChatList(personId, nextPage)) {
+            is NetworkResponse.Success -> {
                 val chatList = response.body.content
                 totalPages = response.body.totalPages
                 Log.i("CHAT_LIST_MEDIATOR", "response size: ${chatList.size}")
                 chatListDao.insertAll(chatList)
-            } else if (response is NetworkResponse.Error)
-                throw response.error ?: throw IOException("Unexpected error. NetworkError even after executeWithRetry?")
-            return MediatorResult.Success(nextPage + 1 == totalPages)
-        } catch (e: IOException) {
-            Log.e("CHAT_REMOTE_MEDIATOR", "IO: $e")
-            return MediatorResult.Error(e)
-        } catch (e: HttpException) {
-            Log.e("CHAT_REMOTE_MEDIATOR", "Http: $e")
-            return MediatorResult.Error(e)
+
+                MediatorResult.Success(nextPage + 1 == totalPages)
+            }
+            is NetworkResponse.NetworkError -> MediatorResult.Error(WaitingForNetworkException())
+            is NetworkResponse.ServerError -> MediatorResult.Error(
+                ServerException("${response.body?.status}: ${response.body?.error}")
+            )
+            is NetworkResponse.UnknownError -> MediatorResult.Error(response.error)
         }
     }
 }

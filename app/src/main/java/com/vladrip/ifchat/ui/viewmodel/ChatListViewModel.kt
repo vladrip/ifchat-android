@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatListViewModel @Inject constructor(
-    private val repository: ChatRepository
+    repository: ChatRepository
 ) : ViewModel() {
     val chatList = repository.getChatList().cachedIn(viewModelScope)
 }

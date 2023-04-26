@@ -16,6 +16,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.vladrip.ifchat.R
 import com.vladrip.ifchat.databinding.FragmentChatListBinding
+import com.vladrip.ifchat.exception.WaitingForNetworkException
 import com.vladrip.ifchat.ui.adapter.ChatListAdapter
 import com.vladrip.ifchat.ui.viewmodel.ChatListViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,12 +61,21 @@ class ChatListFragment : Fragment() {
         if (actionBar != null)
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.CREATED) {
+                    val waitingForNetwork = getString(R.string.waiting_for_network).replaceFirstChar { it.uppercase() }
+                    val loading = getString(R.string.loading).replaceFirstChar { it.uppercase() }
+
                     adapter.loadStateFlow.collect { loadState ->
-                        if (loadState.refresh is LoadState.Loading)
-                            actionBar.title = getString(R.string.loading).replaceFirstChar { it.uppercase() }
-                        else if (loadState.mediator!!.refresh is LoadState.Error)
-                            actionBar.title = getString(R.string.waiting_for_network).replaceFirstChar { it.uppercase() }
-                    else actionBar.title = getString(R.string.app_name)
+                        val mediatorState = loadState.mediator?.refresh
+                        if (mediatorState is LoadState.Error
+                            && mediatorState.error is WaitingForNetworkException) {
+                            actionBar.title = waitingForNetwork
+                            adapter.refresh()
+                        } else if (mediatorState is LoadState.Loading
+                            && actionBar.title != waitingForNetwork) {
+                            actionBar.title = loading
+                        } else if (mediatorState is LoadState.NotLoading) {
+                            actionBar.title = getString(R.string.app_name)
+                        }
                     }
                 }
             }
