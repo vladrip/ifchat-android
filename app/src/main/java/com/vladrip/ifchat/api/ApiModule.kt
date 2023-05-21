@@ -1,6 +1,7 @@
 package com.vladrip.ifchat.api
 
 import android.os.Build
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonPrimitive
@@ -10,6 +11,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDateTime
@@ -27,8 +30,32 @@ object ApiModule {
 
     @Provides
     @Singleton
-    fun provideIFChatService(): IFChatService {
-        val gson = GsonBuilder()
+    fun provideIFChatService(okHttpClient: OkHttpClient, gson: Gson): IFChatService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addCallAdapterFactory(NetworkResponseAdapterFactory())
+            .build()
+            .create(IFChatService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor()
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            //.addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson {
+        return GsonBuilder()
             .registerTypeAdapter(
                 LocalDateTime::class.java,
                 JsonDeserializer { json, _, _ -> LocalDateTime.parse(json.asString) },
@@ -36,12 +63,5 @@ object ApiModule {
                 LocalDateTime::class.java,
                 JsonSerializer<LocalDateTime> { dateTime, _, _ -> JsonPrimitive(dateTime.toString()) }
             ).create()
-
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .addCallAdapterFactory(NetworkResponseAdapterFactory())
-            .build()
-            .create(IFChatService::class.java)
     }
 }

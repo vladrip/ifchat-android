@@ -20,6 +20,7 @@ import com.vladrip.ifchat.exception.WaitingForNetworkException
 import com.vladrip.ifchat.ui.adapter.ChatListAdapter
 import com.vladrip.ifchat.ui.viewmodel.ChatListViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -45,7 +46,6 @@ class ChatListFragment : Fragment() {
         adapter = ChatListAdapter()
         binding.chatList.adapter = adapter
 
-        //@TODO: check if chatList requests new data after fragment is reattached, maybe collect/invalidate manually in onAttach()
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 chatListViewModel.chatList.collectLatest {
@@ -69,6 +69,7 @@ class ChatListFragment : Fragment() {
                         if (mediatorState is LoadState.Error
                             && mediatorState.error is WaitingForNetworkException) {
                             actionBar.title = waitingForNetwork
+                            delay(1000)
                             adapter.refresh()
                         } else if (mediatorState is LoadState.Loading
                             && actionBar.title != waitingForNetwork) {

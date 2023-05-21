@@ -1,19 +1,21 @@
 package com.vladrip.ifchat.api
 
 import com.haroldadmin.cnradapter.NetworkResponse
-import com.vladrip.ifchat.data.CHAT_LIST_NETWORK_PAGE_SIZE
-import com.vladrip.ifchat.data.MESSAGE_NETWORK_PAGE_SIZE
 import com.vladrip.ifchat.model.Chat
 import com.vladrip.ifchat.model.Chat.ChatType
 import com.vladrip.ifchat.model.ChatListEl
 import com.vladrip.ifchat.model.Message
 import com.vladrip.ifchat.model.Person
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+
+const val CHAT_LIST_NETWORK_PAGE_SIZE = 20
+const val MESSAGE_NETWORK_PAGE_SIZE = 25
 
 interface IFChatService {
 
@@ -29,7 +31,6 @@ interface IFChatService {
 
     @GET("chats")
     suspend fun getChatList(
-        @Query("personId") personId: Long,
         @Query("page") page: Int,
         @Query("size") size: Int = CHAT_LIST_NETWORK_PAGE_SIZE,
     ): NetworkResponse<ChatListResponse, ErrorResponse>
@@ -42,8 +43,7 @@ interface IFChatService {
 
     @GET("chats/p{id}")
     suspend fun getPrivateChat(
-        @Path("id") id: Long,
-        @Query("personId") personId: Long,
+        @Path("id") id: Long
     ): NetworkResponse<PrivateChatResponse, ErrorResponse>
 
     @GET("chats/g{id}")
@@ -67,5 +67,15 @@ interface IFChatService {
     @DELETE("messages/{id}")
     suspend fun deleteMessage(
         @Path("id") id: Long,
+    ): NetworkResponse<Unit, ErrorResponse>
+
+    @POST("devices")
+    suspend fun saveDeviceToken(
+        @Body requestBody: RequestBody,
+    ): NetworkResponse<Unit, ErrorResponse>
+
+    @DELETE("devices/{deviceToken}")
+    suspend fun deleteDeviceToken(
+        @Path("deviceToken") deviceToken: String,
     ): NetworkResponse<Unit, ErrorResponse>
 }

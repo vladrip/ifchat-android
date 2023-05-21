@@ -9,9 +9,9 @@ data class ChatListEl(
     @PrimaryKey val chatId: Long,
     val chatName: String,
     val chatType: Chat.ChatType,
-    val lastMsgId: Long,
-    val lastMsgContent: String,
-    val lastMsgSentAt: LocalDateTime,
+    val lastMsgId: Long?,
+    val lastMsgContent: String?,
+    val lastMsgSentAt: LocalDateTime?,
     val isMuted: Boolean,
 ) {
     override fun toString(): String {

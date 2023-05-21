@@ -11,6 +11,6 @@ interface PersonDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(person: Person)
 
-    @Query("SELECT * FROM Person WHERE id = :id")
-    fun get(id: Long): Person?
+    @Query("SELECT * FROM Person WHERE uid = :uid")
+    fun get(uid: String): Person?
 }

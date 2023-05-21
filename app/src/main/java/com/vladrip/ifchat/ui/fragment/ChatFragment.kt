@@ -56,8 +56,7 @@ class ChatFragment : Fragment(), MenuProvider {
         }
 
         initAppBar()
-        //@TODO: get user id (store in app context if authenticated?)
-        adapter = MessagesAdapter(viewModel.chatType, 1) { messageView ->
+        adapter = MessagesAdapter(viewModel.chatType) { messageView ->
             PopupMenu(requireContext(), messageView).apply {
                 setOnMenuItemClickListener {
                     when (it.itemId) {

@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.PagingData
 import androidx.paging.insertSeparators
 import androidx.paging.map
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.vladrip.ifchat.R
 import com.vladrip.ifchat.data.ChatRepository
 import com.vladrip.ifchat.data.MessageRepository
@@ -59,10 +61,11 @@ class ChatViewModel @Inject constructor(
             }
 
     suspend fun sendMessage(text: String) {
+        val uid = Firebase.auth.uid ?: return
         val message = Message(
             chatId = chatId,
             sentAt = LocalDateTime.now(),
-            sender = Message.Sender(id = chatRepository.getUserId()),
+            sender = Message.Sender(uid = uid),
             content = text,
             status = Message.Status.SENDING,
         )

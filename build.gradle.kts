@@ -1,4 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = java.net.URI("https://jitpack.io") }
+    }
+}
+
 plugins {
     id("com.android.application") version "8.0.0-beta05" apply false
     id("com.android.library") version "8.0.0-beta05" apply false

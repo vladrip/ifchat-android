@@ -24,7 +24,7 @@ data class Message(
     val status: Status? = Status.READ,
 ) {
     data class Sender(
-        val id: Long,
+        val uid: String,
         val firstName: String? = null,
         val lastName: String? = null,
     ) {

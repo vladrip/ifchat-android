@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 @Entity
 class ChatMemberShort(
     @PrimaryKey val id: Long,
-    val personId: Long,
+    val personUid: String,
     val firstName: String,
     val lastName: String,
     val onlineAt: LocalDateTime,

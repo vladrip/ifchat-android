@@ -15,34 +15,38 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import com.vladrip.ifchat.api.RequestRestorer
-import com.vladrip.ifchat.mock.Constants.PREFS_SESSION
-import com.vladrip.ifchat.mock.Constants.PREFS_SESSION_EMAIL
+import com.vladrip.ifchat.data.MessagingRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private lateinit var appBarConfiguration: AppBarConfiguration
-    @Inject
-    lateinit var requestRestorer: RequestRestorer
+    @Inject lateinit var requestRestorer: RequestRestorer
+    @Inject lateinit var messagingRepository: MessagingRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat)
+        setContentView(R.layout.activity_main)
 
-//        if (getSharedPreferences(PREFS_SESSION, 0)
-//                .getString(PREFS_SESSION_EMAIL, null).isNullOrBlank()
-//        ) {
-//            openLoginActivity()
-//            return
-//        }
+        if (Firebase.auth.currentUser == null) {
+            startAuthActivity()
+            return
+        }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 requestRestorer.restoreRequests()
+                if (getSharedPreferences(IFChat.PREFS_FIREBASE, 0)
+                        .getString(IFChat.PREFS_FIREBASE_DEVICE_TOKEN, null).isNullOrBlank())
+                    messagingRepository.saveDeviceToken(Firebase.messaging.token.await())
             }
         }
 
@@ -59,18 +63,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun setCustomMenuListeners(menu: Menu) {
         menu.findItem(R.id.logout).setOnMenuItemClickListener {
-            getSharedPreferences(PREFS_SESSION, 0).edit()
-                .putString(PREFS_SESSION_EMAIL, null)
-                .apply()
-            openLoginActivity()
-            true
+            lifecycleScope.launch { messagingRepository.deleteCurrentDeviceToken() }
+            Firebase.auth.signOut()
+            startAuthActivity()
+            return@setOnMenuItemClickListener true
         }
     }
 
-    private fun openLoginActivity() {
-        val loginIntent = Intent(this, LoginActivity::class.java)
-        loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(loginIntent)
+    private fun startAuthActivity() {
+        val authIntent = Intent(this, AuthActivity::class.java)
+        authIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(authIntent)
+        finish()
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -44,9 +44,10 @@ class ChatListAdapter :
     inner class ChatViewHolder(item: View) : RecyclerView.ViewHolder(item) {
         fun bind(chatListEl: ChatListEl) {
             itemView.findViewById<TextView>(R.id.chat_name).text = chatListEl.chatName
-            itemView.findViewById<TextView>(R.id.chat_short_info).text = chatListEl.lastMsgContent.trim()
+            itemView.findViewById<TextView>(R.id.chat_short_info).text =
+                chatListEl.lastMsgContent?.trim() ?: ""
             itemView.findViewById<TextView>(R.id.chat_last_msg_time).text =
-                FormatHelper.formatLastSent(chatListEl.lastMsgSentAt)
+                chatListEl.lastMsgSentAt?.let { FormatHelper.formatLastSent(it) } ?: ""
 
             itemView.setOnClickListener {
                 val bundle = bundleOf(

@@ -7,6 +7,7 @@ import androidx.paging.PagingConfig
 import androidx.room.withTransaction
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.vladrip.ifchat.R
+import com.vladrip.ifchat.api.CHAT_LIST_NETWORK_PAGE_SIZE
 import com.vladrip.ifchat.api.IFChatService
 import com.vladrip.ifchat.db.LocalDatabase
 import com.vladrip.ifchat.model.Chat
@@ -18,8 +19,6 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-const val CHAT_LIST_NETWORK_PAGE_SIZE = 20
-
 @Singleton
 class ChatRepository @Inject constructor(
     private val api: IFChatService,
@@ -29,15 +28,10 @@ class ChatRepository @Inject constructor(
     private val chatListDao = localDb.chatListDao()
     private val personDao = localDb.personDao()
 
-    //@TODO: query db there and pass real person id
-    fun getUserId(): Long {
-        return 1
-    }
-
     @OptIn(ExperimentalPagingApi::class)
     fun getChatList() = Pager(
         config = PagingConfig(CHAT_LIST_NETWORK_PAGE_SIZE),
-        remoteMediator = ChatListRemoteMediator(api, localDb, getUserId())
+        remoteMediator = ChatListRemoteMediator(api, localDb)
     ) {
         chatListDao.getOrderByLatestMsg()
     }.flow
@@ -47,7 +41,7 @@ class ChatRepository @Inject constructor(
         if (localChat != null)
             emit(StateHolder(state = ChatUiState(name = localChat.name)))
 
-        val response = api.getPrivateChat(id, getUserId())
+        val response = api.getPrivateChat(id)
         emit(when (response) {
             is NetworkResponse.Success -> {
                 val body = response.body

@@ -6,8 +6,7 @@
     <string name="hint_password">Password</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="sign_in">Sign in</string>
-    <string name="login">Login</string>
-    <string name="register">Register</string>
+    <string name="authentication">Authentication</string>
     <string name="register_title">Create an account</string>
     <string name="hint_register_username">Enter username</string>
     <string name="hint_password_repeat">Repeat password</string>
@@ -22,6 +21,8 @@
     <string name="loading">loading…</string>
     <string name="unknown">unknown</string>
     <string name="waiting_for_network">waiting for network…</string>
+    <string name="invalid_phone_number">Invalid phone number</string>
+    <string name="invalid_verification_code">Invalid verification code</string>
 
     <!-- DateTime -->
     <string name="last_online">last online %s</string>
@@ -29,7 +30,7 @@
     <string name="last_year">last year</string>
     <string name="years_ago">years ago</string>
     <string name="ago">ago</string>
-
+    
     <!-- Test Preferences -->
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>

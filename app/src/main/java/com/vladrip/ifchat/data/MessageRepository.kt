@@ -7,12 +7,11 @@ import androidx.room.withTransaction
 import com.haroldadmin.cnradapter.NetworkResponse
 import com.haroldadmin.cnradapter.executeWithRetry
 import com.vladrip.ifchat.api.IFChatService
+import com.vladrip.ifchat.api.MESSAGE_NETWORK_PAGE_SIZE
 import com.vladrip.ifchat.db.LocalDatabase
 import com.vladrip.ifchat.model.Message
 import javax.inject.Inject
 import javax.inject.Singleton
-
-const val MESSAGE_NETWORK_PAGE_SIZE = 25
 
 @Singleton
 class MessageRepository @Inject constructor(
@@ -75,5 +74,9 @@ class MessageRepository @Inject constructor(
 
         if (response is NetworkResponse.Success)
             messageDao.delete(id)
+    }
+
+    suspend fun saveMessageLocally(message: Message) {
+        messageDao.insert(message)
     }
 }

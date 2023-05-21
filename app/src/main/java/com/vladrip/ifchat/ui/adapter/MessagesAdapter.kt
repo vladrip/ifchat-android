@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.vladrip.ifchat.R
 import com.vladrip.ifchat.model.Chat.ChatType
 import com.vladrip.ifchat.model.Message
@@ -16,9 +18,9 @@ import com.vladrip.ifchat.utils.FormatHelper
 
 class MessagesAdapter(
     private val chatType: ChatType,
-    private val userId: Long,
     private val onMessageClick: View.OnClickListener,
 ) : PagingDataAdapter<UiModel, ViewHolder>(UI_MODEL_COMPARATOR) {
+    private val userUid = Firebase.auth.uid
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val uiModel = getItem(position)
@@ -55,7 +57,7 @@ class MessagesAdapter(
     override fun getItemViewType(position: Int): Int {
         val uiModel = getItem(position)
         return if (uiModel is UiModel.MessageItem) {
-            if (uiModel.message.sender.id == userId)
+            if (uiModel.message.sender.uid == userUid)
                 R.layout.message_user
             else R.layout.message
         } else R.layout.date_separator

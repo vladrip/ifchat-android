@@ -12,14 +12,14 @@ import androidx.room.PrimaryKey
         childColumns = ["chatId"]
     ), ForeignKey(
         entity = Person::class,
-        parentColumns = ["id"],
-        childColumns = ["personId"]
+        parentColumns = ["uid"],
+        childColumns = ["personUid"]
     )],
-    indices = [Index("chatId"), Index("personId")]
+    indices = [Index("chatId"), Index("personUid")]
 )
 data class ChatMember(
     @PrimaryKey val id: Long,
     val chatId: Long,
-    val personId: Long,
+    val personUid: String,
     val chatMuted: Boolean = false,
 )

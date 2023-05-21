@@ -15,7 +15,7 @@ import java.time.LocalDateTime
     )]
 )
 data class Person(
-    @PrimaryKey val id: Long,
+    @PrimaryKey val uid: String,
     val phoneNumber: String,
     val tag: String?,
     val firstName: String,

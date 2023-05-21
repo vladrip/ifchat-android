@@ -15,8 +15,7 @@ import com.vladrip.ifchat.model.ChatListEl
 @OptIn(ExperimentalPagingApi::class)
 class ChatListRemoteMediator(
     private val api: IFChatService,
-    localDb: LocalDatabase,
-    private val personId: Long,
+    localDb: LocalDatabase
 ) : RemoteMediator<Int, ChatListEl>() {
     private val chatListDao = localDb.chatListDao()
     private var totalPages: Int = 1
@@ -42,7 +41,7 @@ class ChatListRemoteMediator(
 
         Log.i("CHAT_LIST_MEDIATOR", "totalPages: $totalPages")
         Log.i("CHAT_LIST_MEDIATOR", "page: $nextPage")
-        return when (val response = api.getChatList(personId, nextPage)) {
+        return when (val response = api.getChatList(nextPage)) {
             is NetworkResponse.Success -> {
                 val chatList = response.body.content
                 totalPages = response.body.totalPages
