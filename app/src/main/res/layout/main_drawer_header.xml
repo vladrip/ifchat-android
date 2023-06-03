@@ -24,12 +24,10 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/_5sdp"
         android:paddingBottom="@dimen/_2sdp"
-        android:text="@string/test_username"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
         android:id="@+id/drawer_phone_number"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/test_phone_number" />
+        android:layout_height="wrap_content" />
 </LinearLayout>

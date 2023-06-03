@@ -3,7 +3,10 @@ package com.vladrip.ifchat
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,19 +21,19 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
-import com.vladrip.ifchat.api.RequestRestorer
-import com.vladrip.ifchat.data.MessagingRepository
+import com.vladrip.ifchat.model.Chat
+import com.vladrip.ifchat.model.Message
+import com.vladrip.ifchat.ui.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private lateinit var appBarConfiguration: AppBarConfiguration
-    @Inject lateinit var requestRestorer: RequestRestorer
-    @Inject lateinit var messagingRepository: MessagingRepository
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,27 +46,53 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                requestRestorer.restoreRequests()
+                viewModel.restoreRequests()
                 if (getSharedPreferences(IFChat.PREFS_FIREBASE, 0)
-                        .getString(IFChat.PREFS_FIREBASE_DEVICE_TOKEN, null).isNullOrBlank())
-                    messagingRepository.saveDeviceToken(Firebase.messaging.token.await())
+                        .getString(IFChat.PREFS_FIREBASE_DEVICE_TOKEN, null).isNullOrBlank()
+                )
+                    viewModel.saveDeviceToken(Firebase.messaging.token.await())
             }
         }
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_container) as NavHostFragment
         navController = navHostFragment.navController
+
+        intent.getStringExtra("message")?.let {
+            val chatId = viewModel.gson().fromJson(it, Message::class.java).chatId
+            val chatType: Chat.ChatType = Chat.ChatType
+                .valueOf(intent.getStringExtra("chatType") ?: Chat.ChatType.GROUP.name)
+            navController.navigate(
+                R.id.action_chat_list_to_chat, bundleOf(
+                    "chatId" to chatId,
+                    "chatType" to chatType
+                )
+            )
+        }
+
         val drawer = findViewById<NavigationView>(R.id.nav_drawer)
         drawer.setupWithNavController(navController)
         appBarConfiguration =
             AppBarConfiguration(navController.graph, drawer.parent as DrawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         setCustomMenuListeners(drawer.menu)
+
+        Firebase.auth.currentUser?.let { user ->
+            val drawerHeader = drawer.inflateHeaderView(R.layout.main_drawer_header)
+            drawerHeader.findViewById<TextView>(R.id.drawer_phone_number).text = user.phoneNumber
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.CREATED) {
+                    viewModel.getPerson(user.uid).collectLatest {
+                        drawerHeader.findViewById<TextView>(R.id.drawer_username).text = it.fullName
+                    }
+                }
+            }
+        }
     }
 
     private fun setCustomMenuListeners(menu: Menu) {
         menu.findItem(R.id.logout).setOnMenuItemClickListener {
-            lifecycleScope.launch { messagingRepository.deleteCurrentDeviceToken() }
+            lifecycleScope.launch { viewModel.deleteCurrentDeviceToken() }
             Firebase.auth.signOut()
             startAuthActivity()
             return@setOnMenuItemClickListener true

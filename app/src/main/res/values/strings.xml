@@ -19,7 +19,7 @@
     <string name="saved_messages">Saved Messages</string>
     <string name="group_members_count">%d members</string>
     <string name="loading">loading…</string>
-    <string name="unknown">unknown</string>
+    <string name="unknown_error">unknown error</string>
     <string name="waiting_for_network">waiting for network…</string>
     <string name="invalid_phone_number">Invalid phone number</string>
     <string name="invalid_verification_code">Invalid verification code</string>

@@ -80,8 +80,12 @@ class ChatListFragment : Fragment() {
                     }
                 }
             }
-
         addDividersToRecyclerView()
+    }
+
+    override fun onResume() {
+        adapter.refresh()
+        super.onResume()
     }
 
     private fun addDividersToRecyclerView() {

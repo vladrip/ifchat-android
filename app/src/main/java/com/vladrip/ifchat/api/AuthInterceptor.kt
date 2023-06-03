@@ -1,6 +1,5 @@
 package com.vladrip.ifchat.api
 
-import android.util.Log
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -21,7 +20,6 @@ class AuthInterceptor @Inject constructor() : Interceptor {
                 .await(user.getIdToken(false), 5, TimeUnit.SECONDS)
                 .token
 
-            if (token != null) Log.i("TOKEN", token)
             request = request.newBuilder().addHeader("Authorization", "Bearer $token").build()
             return chain.proceed(request)
         } catch (e: Exception) {

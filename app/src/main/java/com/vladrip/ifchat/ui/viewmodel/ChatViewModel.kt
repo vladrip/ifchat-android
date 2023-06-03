@@ -1,5 +1,6 @@
 package com.vladrip.ifchat.ui.viewmodel
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -17,13 +18,16 @@ import com.vladrip.ifchat.ui.state.ChatUiState
 import com.vladrip.ifchat.ui.state.StateHolder
 import com.vladrip.ifchat.utils.FormatHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDateTime
 import javax.inject.Inject
 
+@SuppressLint("StaticFieldLeak") //because lint doesn't know APP context is injected and thinks there is a leak
 @HiltViewModel
 class ChatViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val chatRepository: ChatRepository,
     private val messageRepository: MessageRepository,
@@ -31,7 +35,7 @@ class ChatViewModel @Inject constructor(
     val chatId: Long = savedStateHandle["chatId"]!!
     val chatType: Chat.ChatType = savedStateHandle["chatType"]!!
 
-    fun getChatById(id: Long, type: Chat.ChatType, context: Context): Flow<ChatUiState> {
+    fun getChatById(id: Long, type: Chat.ChatType): Flow<ChatUiState> {
         val chatStateHolder = when (type) {
             Chat.ChatType.PRIVATE -> chatRepository.getPrivateById(id, context)
             Chat.ChatType.GROUP -> chatRepository.getGroupById(id, context)
@@ -39,11 +43,10 @@ class ChatViewModel @Inject constructor(
         return chatStateHolder.map {
             when (it.status) {
                 StateHolder.Status.SUCCESS -> it.state!!
+                StateHolder.Status.LOADING -> ChatUiState(shortInfo = context.getString(R.string.loading))
                 StateHolder.Status.NETWORK_ERROR ->
                     ChatUiState(shortInfo = context.getString(R.string.waiting_for_network))
-
-                StateHolder.Status.LOADING -> ChatUiState(shortInfo = context.getString(R.string.loading))
-                StateHolder.Status.ERROR -> ChatUiState(shortInfo = context.getString(R.string.unknown))
+                StateHolder.Status.ERROR -> ChatUiState(shortInfo = context.getString(R.string.unknown_error))
             }
         }
     }

@@ -16,7 +16,7 @@ interface ChatListDao {
     fun getOrderByLatestMsg(): PagingSource<Int, ChatListEl>
 
     @Query("SELECT lastMsgId FROM ChatListEl WHERE chatId = :chatId")
-    fun getLastMsgIdByChatId(chatId: Long): Long
+    suspend fun getLastMsgIdByChatId(chatId: Long): Long
 
     @Query("DELETE FROM ChatListEl")
     suspend fun clear()

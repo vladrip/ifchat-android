@@ -42,7 +42,7 @@ dependencies {
     val roomVersion = "2.5.0"
     val retrofitVersion = "2.9.0"
     val navigationVersion = "2.5.3"
-    val hiltVersion = "2.44"
+    val hiltVersion = "2.46.1"
     val adaptingUnitsVersion = "1.1.0"
 
     //android, google

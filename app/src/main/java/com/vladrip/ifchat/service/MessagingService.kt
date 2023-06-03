@@ -40,17 +40,13 @@ class MessagingService : FirebaseMessagingService() {
         Log.d(TAG, "From: ${message.from}")
 
         if (message.data.isNotEmpty()) {
-            val messageBody = gson.fromJson(message.data["message"], Message::class.java)
-            Log.d(TAG, "Message data payload: ${message.data["message"]}")
-            if (messageBody == null) return
+            val messageBody = gson.fromJson(message.data["message"], Message::class.java) ?: return
             scope.launch {
                 messageRepository.saveMessageLocally(messageBody)
             }
         }
 
-        message.notification?.let {
-            Log.d(TAG, "Message Notification Body: ${it.body}")
-        }
+
     }
 
     override fun onDestroy() {

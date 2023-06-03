@@ -78,4 +78,9 @@ interface IFChatService {
     suspend fun deleteDeviceToken(
         @Path("deviceToken") deviceToken: String,
     ): NetworkResponse<Unit, ErrorResponse>
+
+    @GET("persons/{uid}")
+    suspend fun getPerson(
+        @Path("uid") uid: String
+    ): NetworkResponse<Person, ErrorResponse>
 }

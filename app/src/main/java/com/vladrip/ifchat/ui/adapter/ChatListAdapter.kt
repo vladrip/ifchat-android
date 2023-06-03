@@ -45,7 +45,7 @@ class ChatListAdapter :
         fun bind(chatListEl: ChatListEl) {
             itemView.findViewById<TextView>(R.id.chat_name).text = chatListEl.chatName
             itemView.findViewById<TextView>(R.id.chat_short_info).text =
-                chatListEl.lastMsgContent?.trim() ?: ""
+                chatListEl.lastMsgContent?.replace("\n", " ")?.trim() ?: ""
             itemView.findViewById<TextView>(R.id.chat_last_msg_time).text =
                 chatListEl.lastMsgSentAt?.let { FormatHelper.formatLastSent(it) } ?: ""
 

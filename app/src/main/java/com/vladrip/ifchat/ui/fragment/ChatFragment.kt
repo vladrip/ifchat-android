@@ -78,7 +78,7 @@ class ChatFragment : Fragment(), MenuProvider {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.getChatById(viewModel.chatId, viewModel.chatType, requireContext())
+                viewModel.getChatById(viewModel.chatId, viewModel.chatType)
                     .collectLatest { fillAppBar(it) }
             }
         }
@@ -87,9 +87,14 @@ class ChatFragment : Fragment(), MenuProvider {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.getMessages(viewModel.chatId).retry {true}.collectLatest {
                     adapter.submitData(it)
-                    adapter.onPagesUpdatedFlow.take(1).collect {
-                        binding.messages.scrollToPosition(adapter.itemCount - 1)
-                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                adapter.onPagesUpdatedFlow.collect {
+                    binding.messages.scrollToPosition(adapter.itemCount - 1)
                 }
             }
         }

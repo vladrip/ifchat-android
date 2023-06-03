@@ -5,7 +5,6 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import androidx.room.withTransaction
 import com.vladrip.ifchat.api.IFChatService
 import com.vladrip.ifchat.db.LocalDatabase
 import com.vladrip.ifchat.model.Message
@@ -33,9 +32,7 @@ class MessageRemoteMediator(
             LoadType.REFRESH -> {
                 val anchorMsgId =
                     state.anchorPosition?.let { state.closestItemToPosition(it)?.id }
-                        ?: localDb.withTransaction {
-                            localDb.chatListDao().getLastMsgIdByChatId(chatId)
-                        }
+                        ?: localDb.chatListDao().getLastMsgIdByChatId(chatId)
                 anchorMsgId
             }
 
@@ -61,6 +58,7 @@ class MessageRemoteMediator(
                 beforeId = if (loadType == LoadType.PREPEND || isRefresh) loadKey else 0
             )
 
+            if (isRefresh) messageDao.clear(chatId)
             messageDao.insertAll(messages)
             return MediatorResult.Success(endOfPaginationReached = messages.isEmpty())
         } catch (e: IOException) {

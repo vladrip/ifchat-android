@@ -6,6 +6,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.room.withTransaction
 import com.haroldadmin.cnradapter.NetworkResponse
+import com.haroldadmin.cnradapter.executeWithRetry
 import com.vladrip.ifchat.R
 import com.vladrip.ifchat.api.CHAT_LIST_NETWORK_PAGE_SIZE
 import com.vladrip.ifchat.api.IFChatService
@@ -38,10 +39,18 @@ class ChatRepository @Inject constructor(
 
     fun getPrivateById(id: Long, context: Context): Flow<StateHolder<ChatUiState>> = flow {
         val localChat = chatDao.get(id)
-        if (localChat != null)
-            emit(StateHolder(state = ChatUiState(name = localChat.name)))
+        emit(
+            if (localChat != null)
+                StateHolder(state = ChatUiState(name = localChat.name))
+            else StateHolder(status = StateHolder.Status.LOADING)
+        )
 
-        val response = api.getPrivateChat(id)
+        var response = api.getPrivateChat(id)
+        if (response is NetworkResponse.NetworkError) {
+            emit(StateHolder(status = StateHolder.Status.NETWORK_ERROR))
+            response = executeWithRetry(times = Int.MAX_VALUE) { api.getPrivateChat(id) }
+        }
+
         emit(when (response) {
             is NetworkResponse.Success -> {
                 val body = response.body
@@ -59,15 +68,14 @@ class ChatRepository @Inject constructor(
                 )
             }
 
-            is NetworkResponse.NetworkError -> StateHolder(status = StateHolder.Status.NETWORK_ERROR)
             else -> StateHolder(status = StateHolder.Status.ERROR)
         })
     }
 
     fun getGroupById(id: Long, context: Context): Flow<StateHolder<ChatUiState>> = flow {
         val localChat = chatDao.get(id)
-        if (localChat != null)
-            emit(
+        emit(
+            if (localChat != null)
                 StateHolder(
                     state = ChatUiState(
                         name = localChat.name,
@@ -77,9 +85,15 @@ class ChatRepository @Inject constructor(
                         )
                     )
                 )
-            )
+            else StateHolder(status = StateHolder.Status.LOADING)
+        )
 
-        val response = api.getGroupChat(id)
+        var response = api.getGroupChat(id)
+        if (response is NetworkResponse.NetworkError) {
+            emit(StateHolder(status = StateHolder.Status.NETWORK_ERROR))
+            response = executeWithRetry(times = Int.MAX_VALUE) { api.getGroupChat(id) }
+        }
+
         emit(when (response) {
             is NetworkResponse.Success -> {
                 val chat = response.body
@@ -95,7 +109,6 @@ class ChatRepository @Inject constructor(
                 )
             }
 
-            is NetworkResponse.NetworkError -> StateHolder(status = StateHolder.Status.NETWORK_ERROR)
             else -> StateHolder(status = StateHolder.Status.ERROR)
         })
     }
