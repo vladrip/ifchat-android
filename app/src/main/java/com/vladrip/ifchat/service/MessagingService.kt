@@ -28,10 +28,7 @@ class MessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         Log.i(TAG, "onNewToken($token)")
         scope.launch {
-            while (true) {
-                if (Firebase.auth.currentUser == null) break
-                else delay(1000L)
-            }
+            while (Firebase.auth.currentUser == null) delay(1000L)
             messagingRepository.saveDeviceToken(token)
         }
     }
@@ -40,13 +37,12 @@ class MessagingService : FirebaseMessagingService() {
         Log.d(TAG, "From: ${message.from}")
 
         if (message.data.isNotEmpty()) {
-            val messageBody = gson.fromJson(message.data["message"], Message::class.java) ?: return
+            val messageBody =
+                gson.fromJson(message.data["message"], Message::class.java) ?: return
             scope.launch {
                 messageRepository.saveMessageLocally(messageBody)
             }
         }
-
-
     }
 
     override fun onDestroy() {

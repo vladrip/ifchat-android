@@ -47,10 +47,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.restoreRequests()
-                if (getSharedPreferences(IFChat.PREFS_FIREBASE, 0)
-                        .getString(IFChat.PREFS_FIREBASE_DEVICE_TOKEN, null).isNullOrBlank()
-                )
-                    viewModel.saveDeviceToken(Firebase.messaging.token.await())
+                viewModel.saveDeviceToken(Firebase.messaging.token.await())
             }
         }
 
@@ -92,8 +89,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setCustomMenuListeners(menu: Menu) {
         menu.findItem(R.id.logout).setOnMenuItemClickListener {
-            lifecycleScope.launch { viewModel.deleteCurrentDeviceToken() }
-            Firebase.auth.signOut()
+            lifecycleScope.launch { viewModel.logout() }
             startAuthActivity()
             return@setOnMenuItemClickListener true
         }

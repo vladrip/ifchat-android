@@ -3,11 +3,15 @@ package com.vladrip.ifchat.ui.viewmodel
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.room.withTransaction
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.vladrip.ifchat.R
 import com.vladrip.ifchat.api.RequestRestorer
 import com.vladrip.ifchat.data.MessagingRepository
 import com.vladrip.ifchat.data.PersonRepository
+import com.vladrip.ifchat.db.LocalDatabase
 import com.vladrip.ifchat.ui.state.PersonUiState
 import com.vladrip.ifchat.ui.state.StateHolder
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +27,8 @@ class MainViewModel @Inject constructor(
     private val personRepository: PersonRepository,
     private val messagingRepository: MessagingRepository,
     private val requestRestorer: RequestRestorer,
-    private val gson: Gson
+    private val localDb: LocalDatabase,
+    private val gson: Gson,
 ) : ViewModel() {
 
     fun getPerson(uid: String): Flow<PersonUiState> {
@@ -48,8 +53,10 @@ class MainViewModel @Inject constructor(
         messagingRepository.saveDeviceToken(token)
     }
 
-    suspend fun deleteCurrentDeviceToken() {
+    suspend fun logout() {
         messagingRepository.deleteCurrentDeviceToken()
+        localDb.withTransaction { localDb.clearAllTables() }
+        Firebase.auth.signOut()
     }
 
     fun gson(): Gson {
