@@ -30,7 +30,7 @@
     <string name="last_year">last year</string>
     <string name="years_ago">years ago</string>
     <string name="ago">ago</string>
-    
+
     <!-- Test Preferences -->
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
@@ -63,4 +63,7 @@
     <string name="send_message">Send message</string>
     <string name="message_status">message status</string>
     <string name="delete">Delete</string>
+    <string name="tab_info">Info</string>
+    <string name="tab_members">Members</string>
+    <string name="description">Description</string>
 </resources>

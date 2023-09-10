@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.application")
     kotlin("android")
+    id("com.android.application")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
@@ -8,16 +8,16 @@ plugins {
 
 android {
     namespace = "com.vladrip.ifchat"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.vladrip.ifchat"
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "0.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testApplicationId = "com.vladrip.ifchat"
+        testApplicationId = "com.vladrip.test.ifchat"
     }
 
     compileOptions {
@@ -39,17 +39,17 @@ android {
 }
 
 dependencies {
-    val roomVersion = "2.5.0"
+    val roomVersion = "2.6.0-beta01"
     val retrofitVersion = "2.9.0"
-    val navigationVersion = "2.5.3"
-    val hiltVersion = "2.46.1"
+    val navigationVersion = "2.7.2"
+    val hiltVersion = "2.48"
     val adaptingUnitsVersion = "1.1.0"
 
     //android, google
-    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.preference:preference:1.2.0")
+    implementation("androidx.preference:preference:1.2.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
@@ -67,10 +67,11 @@ dependencies {
     //room, paging
     implementation("androidx.room:room-runtime:$roomVersion")
     annotationProcessor("androidx.room:room-compiler:$roomVersion")
+    //noinspection KaptUsageInsteadOfKsp
     kapt("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     implementation("androidx.room:room-paging:$roomVersion")
-    implementation("androidx.paging:paging-runtime:3.1.1")
+    implementation("androidx.paging:paging-runtime:3.2.1")
 
     //retrofit
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")

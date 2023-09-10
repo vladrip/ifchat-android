@@ -7,3 +7,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+/.idea/discord-ij.xml
+/.idea/discord.xml

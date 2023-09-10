@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/chat_image"
+        android:id="@+id/member_avatar"
         android:layout_width="@dimen/_36sdp"
         android:layout_height="@dimen/_36sdp"
         android:layout_alignParentStart="true"
@@ -22,10 +22,10 @@
         android:layout_height="@dimen/_2sdp"
         android:layout_centerVertical="true"
         android:layout_marginStart="@dimen/_8sdp"
-        android:layout_toEndOf="@id/chat_image" />
+        android:layout_toEndOf="@id/member_avatar" />
 
     <TextView
-        android:id="@+id/chat_name"
+        android:id="@+id/member_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/pivot_center"
@@ -35,11 +35,11 @@
         android:textSize="@dimen/_12ssp" />
 
     <TextView
-        android:id="@+id/chat_short_info"
+        android:id="@+id/member_online"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/pivot_center"
-        android:layout_alignStart="@id/chat_name"
+        android:layout_alignStart="@id/member_name"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/disabled"

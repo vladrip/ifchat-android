@@ -6,7 +6,7 @@
     android:layout_marginHorizontal="@dimen/_8sdp">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/chat_image"
+        android:id="@+id/member_avatar"
         android:layout_width="@dimen/_42sdp"
         android:layout_height="@dimen/_42sdp"
         android:layout_alignParentStart="true"
@@ -22,24 +22,23 @@
         android:layout_height="@dimen/_6sdp"
         android:layout_centerVertical="true"
         android:layout_marginStart="@dimen/_12sdp"
-        android:layout_toEndOf="@id/chat_image" />
+        android:layout_toEndOf="@id/member_avatar" />
 
     <TextView
-        android:id="@+id/chat_name"
+        android:id="@+id/member_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/pivot_center"
         android:layout_alignStart="@id/pivot_center"
         android:text="@string/test_username"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="@dimen/_12ssp" />
 
     <TextView
-        android:id="@+id/chat_short_info"
+        android:id="@+id/member_online"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/pivot_center"
-        android:layout_alignStart="@id/chat_name"
+        android:layout_alignStart="@id/member_name"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="@string/test_list_chat_short_info" />
@@ -48,7 +47,7 @@
         android:id="@+id/chat_last_msg_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/chat_name"
+        android:layout_alignBaseline="@id/member_name"
         android:layout_alignParentEnd="true"
         android:gravity="end"
         android:text="@string/test_chat_last_msg_time" />

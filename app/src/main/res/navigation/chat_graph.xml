@@ -7,8 +7,9 @@
 
     <fragment
         android:id="@+id/fragment_chat"
-        android:name="com.vladrip.ifchat.ui.fragment.ChatFragment"
+        android:name="com.vladrip.ifchat.ui.chat.ChatFragment"
         tools:layout="@layout/fragment_chat">
+
         <argument
             android:name="chatId"
             android:defaultValue="-1L"
@@ -16,6 +17,25 @@
         <argument
             android:name="chatType"
             android:defaultValue="GROUP"
-            app:argType="com.vladrip.ifchat.model.Chat$ChatType" />
+            app:argType="com.vladrip.ifchat.data.entity.Chat$ChatType" />
+
+        <action
+            android:id="@+id/action_chat_to_chat_info"
+            app:destination="@id/fragment_chat_info" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_chat_info"
+        android:name="com.vladrip.ifchat.ui.chat.info.ChatInfoFragment"
+        tools:layout="@layout/fragment_chat_info">
+
+        <argument
+            android:name="chatId"
+            android:defaultValue="-1L"
+            app:argType="long" />
+        <argument
+            android:name="chatType"
+            android:defaultValue="GROUP"
+            app:argType="com.vladrip.ifchat.data.entity.Chat$ChatType" />
     </fragment>
 </navigation>
