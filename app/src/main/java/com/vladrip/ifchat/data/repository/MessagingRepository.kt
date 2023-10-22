@@ -5,9 +5,8 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
 import com.haroldadmin.cnradapter.executeWithRetry
 import com.vladrip.ifchat.data.network.IFChatService
+import com.vladrip.ifchat.data.network.model.StringWrapper
 import kotlinx.coroutines.tasks.await
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,9 +16,8 @@ class MessagingRepository @Inject constructor(
 ) {
 
     suspend fun saveDeviceToken(deviceToken: String) {
-        val body = deviceToken.toRequestBody("text/plain".toMediaType())
         executeWithRetry(times = Int.MAX_VALUE, initialDelay = 1000L) {
-            api.saveDeviceToken(body)
+            api.saveDeviceToken(StringWrapper(deviceToken))
         }
         Log.i(TAG, "saveDeviceToken($deviceToken)")
     }

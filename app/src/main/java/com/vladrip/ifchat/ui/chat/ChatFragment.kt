@@ -54,6 +54,8 @@ class ChatFragment : Fragment(), MenuProvider {
         }
 
         initAppBar()
+        initMessageInput()
+
         adapter = MessagesAdapter(viewModel.chatType) { messageView ->
             PopupMenu(requireContext(), messageView).apply {
                 setOnMenuItemClickListener {
@@ -76,12 +78,6 @@ class ChatFragment : Fragment(), MenuProvider {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                viewModel.getChat().collectLatest { fillAppBar(it) }
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 viewModel.getMessages().retry { true }.collectLatest {
                     adapter.submitData(it)
                 }
@@ -95,7 +91,39 @@ class ChatFragment : Fragment(), MenuProvider {
                 }
             }
         }
+    }
 
+    private fun initAppBar() {
+        appbar = layoutInflater.inflate(R.layout.appbar_chat, binding.root, false)
+        appbar.findViewById<TextView>(R.id.member_online).text = getString(R.string.loading)
+        appbar.setOnClickListener {
+            val navActionId = when (viewModel.chatType) {
+                else -> R.id.action_chat_to_chat_info
+            }
+            findNavController().navigate(
+                navActionId,
+                bundleOf("chatId" to viewModel.chatId)
+            )
+        }
+
+        (requireActivity() as AppCompatActivity).supportActionBar?.run {
+            setDisplayShowCustomEnabled(true)
+            customView = appbar
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.chat.collectLatest { chat ->
+                    chat.name?.let { appbar.findViewById<TextView>(R.id.member_name).text = it }
+                    chat.shortInfo?.let {
+                        appbar.findViewById<TextView>(R.id.member_online).text = it
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initMessageInput() {
         binding.messageInput.addTextChangedListener {
             val isSendEnabled = binding.sendMessage.isEnabled
             if (it.isNullOrBlank() && isSendEnabled) {
@@ -121,38 +149,27 @@ class ChatFragment : Fragment(), MenuProvider {
         }
     }
 
-    private fun initAppBar() {
-        appbar = layoutInflater.inflate(R.layout.appbar_chat, binding.root, false)
-        appbar.findViewById<TextView>(R.id.member_online).text = getString(R.string.loading)
-        appbar.setOnClickListener {
-            val navActionId = when (viewModel.chatType) {
-                else -> R.id.action_chat_to_chat_info
-            }
-            findNavController().navigate(
-                navActionId,
-                bundleOf("chatId" to viewModel.chatId)
-            )
-        }
-
-        (requireActivity() as AppCompatActivity).supportActionBar?.run {
-            setDisplayShowCustomEnabled(true)
-            customView = appbar
-        }
-    }
-
-    private fun fillAppBar(chat: ChatUiState) {
-        if (chat.name != null) appbar.findViewById<TextView>(R.id.member_name).text = chat.name
-        if (chat.shortInfo != null)
-            appbar.findViewById<TextView>(R.id.member_online).text = chat.shortInfo
-    }
-
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.chat_menu, menu)
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.chat.collectLatest { chatUiState ->
+                    chatUiState.userChatMember?.let {
+                        menu.findItem(R.id.chat_mute).setVisible(!it.isChatMuted)
+                        menu.findItem(R.id.chat_unmute).setVisible(it.isChatMuted)
+                    }
+                }
+            }
+        }
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             android.R.id.home -> findNavController().navigateUp()
+            R.id.chat_mute ->
+                viewLifecycleOwner.lifecycleScope.launch { viewModel.muteChat(true) }
+            R.id.chat_unmute ->
+                viewLifecycleOwner.lifecycleScope.launch { viewModel.muteChat(false) }
         }
         return true
     }

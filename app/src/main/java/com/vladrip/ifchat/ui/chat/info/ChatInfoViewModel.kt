@@ -26,7 +26,7 @@ class ChatInfoViewModel @Inject constructor(
     val members = chatRepository.getMembers(chatId).cachedIn(viewModelScope)
 
     fun getChatInfo(): Flow<ChatInfoUiState> =
-        chatRepository.getChatById(chatId).map {
+        chatRepository.getChat(chatId).map {
             when (it.status) {
                 DataHolder.Status.SUCCESS -> ChatInfoUiState(it.data!!.description)
                 DataHolder.Status.LOADING -> ChatInfoUiState(context.getString(R.string.loading))

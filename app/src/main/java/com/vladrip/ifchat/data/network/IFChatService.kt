@@ -6,11 +6,11 @@ import com.vladrip.ifchat.data.entity.ChatMemberShort
 import com.vladrip.ifchat.data.entity.Message
 import com.vladrip.ifchat.data.entity.Person
 import com.vladrip.ifchat.data.network.model.*
-import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -51,7 +51,7 @@ interface IFChatService {
 
     @POST("devices")
     suspend fun saveDeviceToken(
-        @Body requestBody: RequestBody,
+        @Body deviceToken: StringWrapper,
     ): NetworkResponse<Unit, ErrorResponse>
 
     @DELETE("devices/{deviceToken}")
@@ -70,4 +70,11 @@ interface IFChatService {
         @Query("page") page: Int,
         @Query("size") size: Int = CHAT_MEMBERS_PAGE_SIZE,
     ): NetworkResponse<PagedResponse<ChatMemberShort>, ErrorResponse>
+
+    @PUT("persons/{uid}/chats/{chatId}/chat-muted")
+    suspend fun setIsChatMuted(
+        @Path("uid") personUid: String,
+        @Path("chatId") chatId: Long,
+        @Body isChatMuted: BooleanWrapper,
+    ): NetworkResponse<UserChatMemberDto, ErrorResponse>
 }

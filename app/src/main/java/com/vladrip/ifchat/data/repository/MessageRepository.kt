@@ -20,6 +20,7 @@ class MessageRepository @Inject constructor(
     private val localDb: LocalDatabase,
 ) {
     private val messageDao = localDb.messageDao()
+    private val chatListDao = localDb.chatListDao()
 
     @OptIn(ExperimentalPagingApi::class)
     fun getMessagesByChatId(chatId: Long) = Pager(
@@ -56,17 +57,17 @@ class MessageRepository @Inject constructor(
     }
 
     suspend fun delete(id: Long) {
-        var isSending = false
+        var isMessageLocal = false
         localDb.withTransaction {
             val message = messageDao.get(id)
             if (message.status == Message.Status.SENDING) {
-                isSending = true
+                isMessageLocal = true
                 messageDao.delete(id)
                 return@withTransaction
             }
             messageDao.insert(message.copy(status = Message.Status.DELETING))
         }
-        if (isSending) return
+        if (isMessageLocal) return
 
         val response = executeWithRetry(
             times = Int.MAX_VALUE,
@@ -79,5 +80,7 @@ class MessageRepository @Inject constructor(
 
     suspend fun saveMessageLocally(message: Message) {
         messageDao.insert(message)
+        chatListDao
+            .updateLastMsg(message.chatId, message.id, message.content, message.sentAt)
     }
 }

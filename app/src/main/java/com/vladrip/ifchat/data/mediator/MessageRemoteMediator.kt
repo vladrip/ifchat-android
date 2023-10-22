@@ -32,7 +32,7 @@ class MessageRemoteMediator(
             LoadType.REFRESH -> {
                 val anchorMsgId =
                     state.anchorPosition?.let { state.closestItemToPosition(it)?.id }
-                        ?: localDb.chatListDao().getLastMsgIdByChatId(chatId)
+                        ?: localDb.chatListDao().getLastMsgId(chatId)
                 anchorMsgId
             }
 

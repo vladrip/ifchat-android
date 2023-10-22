@@ -52,6 +52,7 @@ class AuthActivity : AppCompatActivity() {
             .setAction(Intent.ACTION_VIEW)
         mainIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(mainIntent)
+        finish()
     }
 
     companion object {

@@ -7,6 +7,7 @@ data class ChatDto(
     val id: Long,
     val type: ChatType,
     val otherPerson: Person?,
+    val userChatMember: UserChatMemberDto,
     val name: String,
     val description: String,
     val memberCount: Int,

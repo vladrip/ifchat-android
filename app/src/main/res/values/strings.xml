@@ -56,7 +56,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="contacts">Contacts</string>
     <string name="search">Search</string>
-    <string name="mute_notifications">Mute Notifications</string>
+    <string name="mute">Mute</string>
     <string name="test_list_chat_short_info">Newest message in chat</string>
     <string name="test_chat_last_msg_time">14:52</string>
     <string name="message_input_hint">Message</string>
@@ -66,4 +66,6 @@
     <string name="tab_info">Info</string>
     <string name="tab_members">Members</string>
     <string name="description">Description</string>
+    <string name="create_chat">Create chat</string>
+    <string name="unmute">Unmute</string>
 </resources>

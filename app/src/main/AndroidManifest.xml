@@ -22,7 +22,6 @@
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -30,7 +29,6 @@
             android:name=".ui.auth.AuthActivity"
             android:exported="false"
             android:label="@string/authentication" />
-
 
         <service
             android:name=".data.service.MessagingService"

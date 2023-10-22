@@ -39,10 +39,10 @@ android {
 }
 
 dependencies {
-    val roomVersion = "2.6.0-beta01"
+    val roomVersion = "2.6.0-rc01"
     val retrofitVersion = "2.9.0"
-    val navigationVersion = "2.7.2"
-    val hiltVersion = "2.48"
+    val navigationVersion = "2.7.4"
+    val hiltVersion = "2.47"
     val adaptingUnitsVersion = "1.1.0"
 
     //android, google
@@ -50,19 +50,19 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.preference:preference:1.2.1")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.10.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
     //firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.0.0"))
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
     //navigation
-    implementation("androidx.navigation:navigation-fragment:$navigationVersion")
-    implementation("androidx.navigation:navigation-ui:$navigationVersion")
+    implementation("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
+    implementation("androidx.navigation:navigation-ui-ktx:$navigationVersion")
 
     //room, paging
     implementation("androidx.room:room-runtime:$roomVersion")

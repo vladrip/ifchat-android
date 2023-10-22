@@ -5,6 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.vladrip.ifchat.data.entity.Chat
+import com.vladrip.ifchat.data.network.model.UserChatMemberDto
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChatDao {
@@ -12,5 +14,8 @@ interface ChatDao {
     suspend fun insert(chat: Chat)
 
     @Query("SELECT * FROM Chat c WHERE id = :id")
-    suspend fun get(id: Long): Chat?
+    fun get(id: Long): Flow<Chat>
+
+    @Query("UPDATE Chat SET userChatMember = :userChatMember WHERE id = :id")
+    suspend fun updateUserChatMember(id: Long, userChatMember: UserChatMemberDto)
 }

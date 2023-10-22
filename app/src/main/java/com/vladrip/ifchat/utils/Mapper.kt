@@ -8,6 +8,7 @@ object Mapper {
         Chat(
             id = chatDto.id,
             otherPersonUid = chatDto.otherPerson?.uid,
+            userChatMember = chatDto.userChatMember,
             type = chatDto.type,
             name = chatDto.name,
             description = chatDto.description,

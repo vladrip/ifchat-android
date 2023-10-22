@@ -15,4 +15,18 @@
         android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/create_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/_16sdp"
+        android:backgroundTint="@color/palette2_lighter"
+        android:contentDescription="@string/create_chat"
+        app:tint="@color/palette3"
+        app:borderWidth="0dp"
+        app:maxImageSize="32dp"
+        app:rippleColor="@color/palette2"
+        app:srcCompat="@drawable/create_chat" />
+
 </FrameLayout>

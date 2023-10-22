@@ -37,8 +37,6 @@ class MessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        Log.d(TAG, "From: ${message.from}")
-
         if (message.data.isNotEmpty()) {
             val messageBody =
                 gson.fromJson(message.data["message"], Message::class.java) ?: return

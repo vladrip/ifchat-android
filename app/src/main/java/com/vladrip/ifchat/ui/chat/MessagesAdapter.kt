@@ -96,7 +96,7 @@ class MessagesAdapter(
                 when (message.status) {
                     Message.Status.SENDING -> R.drawable.message_sending
                     Message.Status.SENT -> R.drawable.message_sent
-                    Message.Status.DELETING -> R.drawable.delete
+                    Message.Status.DELETING -> R.drawable.message_delete
                     else -> R.drawable.message_read
                 }
             )

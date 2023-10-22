@@ -2,6 +2,7 @@ package com.vladrip.ifchat.ui.chat
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagingData
@@ -13,6 +14,7 @@ import com.vladrip.ifchat.R
 import com.vladrip.ifchat.data.DataHolder.Status
 import com.vladrip.ifchat.data.entity.Chat.ChatType
 import com.vladrip.ifchat.data.entity.Message
+import com.vladrip.ifchat.data.network.model.UserChatMemberDto
 import com.vladrip.ifchat.data.repository.ChatRepository
 import com.vladrip.ifchat.data.repository.MessageRepository
 import com.vladrip.ifchat.data.repository.PersonRepository
@@ -36,8 +38,8 @@ class ChatViewModel @Inject constructor(
 ) : ViewModel() {
     val chatId: Long = savedStateHandle["chatId"]!!
     val chatType: ChatType = savedStateHandle["chatType"]!!
-
-    fun getChat(): Flow<ChatUiState> = chatRepository.getChatById(chatId).map {
+    val chat = chatRepository.getChat(chatId).map {
+        it.data?.let { data -> Log.i("CHAT", it.status.name + data.userChatMember?.isChatMuted.toString()) }
         when (it.status) {
             Status.SUCCESS -> {
                 val chat = it.data!!
@@ -48,6 +50,7 @@ class ChatViewModel @Inject constructor(
                         ChatUiState(
                             name = otherPerson?.fullName(),
                             shortInfo = otherPerson?.onlineAt.toString(),
+                            userChatMember = chat.userChatMember
                         )
                     }
 
@@ -92,6 +95,10 @@ class ChatViewModel @Inject constructor(
     suspend fun deleteMessage(id: Long) {
         messageRepository.delete(id)
     }
+
+    suspend fun muteChat(value: Boolean): Boolean {
+        return chatRepository.muteChat(chatId, value)
+    }
 }
 
 sealed class UiModel {
@@ -102,4 +109,5 @@ sealed class UiModel {
 data class ChatUiState(
     val name: String? = null,
     val shortInfo: String? = null,
+    val userChatMember: UserChatMemberDto? = null
 )
