@@ -1,3 +1,4 @@
+# Moved to monorepo: https://github.com/vladrip/ifchat
 # ifchat-android
 Android application for chat system "IFChat".<br>
 
